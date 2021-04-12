@@ -5,6 +5,7 @@ import type { DottedPath } from 'optics-ts/dist/lib/utils';
 import * as React from 'react';
 
 import * as Ctx from './FormContext.js';
+import type { FieldBufferProps } from './components/Field.js';
 
 
 //type RenderProp<P, C extends React.ReactNode = React.ReactNode> = C | ((props: P) => C);
@@ -45,3 +46,30 @@ export const useAccessorFor = <A,>(FormContext: Ctx.FormContext<A>) => <F,>(acce
     
     return { buffer, updateBuffer };
 };
+
+export const ConnectAccessor = <F, P extends FieldBufferProps<F>>(Component: React.ComponentType<P>) =>
+    <A,>(FormContext: Ctx.FormContext<A>) => {
+        type ElementRefT = React.ElementRef<typeof Component>;
+        type RefT = React.PropsWithRef<P> extends { ref?: infer R } ? R : never;
+        type PropsT = Omit<React.PropsWithoutRef<P>, keyof FieldBufferProps<F>> & {
+            accessor: AccessorProp<A, F>,
+        };
+        
+        const forwarder: React.ForwardRefRenderFunction<ElementRefT, PropsT> = ({ accessor, ...props }, ref) => {
+            const useAccessor = React.useMemo(() => useAccessorFor(FormContext), []);
+            
+            const { buffer, updateBuffer } = useAccessor(accessor);
+            
+            // Note: TS will complain that `P` may be instantiated with a different subtype of `FieldBufferProps<F>`.
+            // We assume (but cannot enforce in the type constraint) that this is not the case.
+            // @ts-ignore
+            const propsWithRef: P = { ref, ...props, buffer, updateBuffer };
+            return (
+                <Component {...propsWithRef}/>
+            );
+        };
+        const displayName = `ProformConnect(${Component.displayName ?? 'Anonymous'})`;
+        Object.defineProperty(forwarder, 'name', { value: displayName });
+        
+        return React.forwardRef<ElementRefT, PropsT>(forwarder);
+    };

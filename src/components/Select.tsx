@@ -7,8 +7,8 @@ import type { ClassNameArgument } from '../util/components.js';
 import * as React from 'react';
 
 import * as Ctx from '../FormContext.js';
-import { AccessorProp, useAccessorFor } from '../Accessor.js';
 import type { FieldBufferProps } from './Field.js';
+import { AccessorProp, useAccessorFor, ConnectAccessor } from '../Accessor.js';
 
 
 export type OptionKey = PropertyKey;
@@ -43,7 +43,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>((props, r
 });
 Select.displayName = 'Select';
 
-
+/*
 type SelectForProps<A> = Omit<SelectProps, keyof FieldBufferProps<string>> & {
     accessor: AccessorProp<A, string>,
 };
@@ -65,11 +65,6 @@ export const SelectFor = <A,>(FormContext: Ctx.FormContext<A>) => {
     
     return React.forwardRef<ElementRefT, PropsT>(forwarder);
 };
-
-/*
-export const ConnectAccessor = <P,>(Component: React.ComponentType<P>) => <A,>(FormContext: Ctx.FormContext<A>) => {
-    type ElementRefT = React.ElementRef<typeof Select>;
-    type RefT = React.ComponentPropsWithRef<typeof Select>['ref'];
-    type PropsT = SelectForProps<A>;
-};
 */
+
+export const SelectFor = ConnectAccessor<string, SelectProps>(Select);

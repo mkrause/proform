@@ -70,6 +70,7 @@ export const test = () => {
         
         const Select = SelectFor(Form.FormContext);
         const ref = React.useRef(null);
+        // @ts-ignore
         window.ref = ref;
         
         return (
