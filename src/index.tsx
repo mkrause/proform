@@ -4,6 +4,8 @@ import * as React from 'react';
 //import * as Ctx from './FormContext.js';
 import * as Proform from './proform.js';
 
+import { SelectFor } from './components/Select.js';
+
 
 
 // const FormContextGeneric = Ctx.createFormContext<unknown>();
@@ -40,6 +42,7 @@ type Test = O.OpticFor<42>;
 */
 
 export const test = () => {
+    type UserRole = 'user' | 'admin';
     type UserPermission = 'view' | 'edit' | 'manage';
     type User = {
         name: string,
@@ -48,6 +51,7 @@ export const test = () => {
             postalCode: string,
             phoneNumber: string,
         },
+        role: UserRole,
         permissions: Array<UserPermission>,
     };
     
@@ -60,8 +64,13 @@ export const test = () => {
                 postalCode: '',
                 phoneNumber: '',
             },
+            role: 'user',
             permissions: [],
         });
+        
+        const Select = SelectFor(Form.FormContext);
+        const ref = React.useRef(null);
+        window.ref = ref;
         
         return (
             <Form.FormProvider
@@ -91,6 +100,15 @@ export const test = () => {
                     <Form.InputTextField
                         accessor="contact.phoneNumber"
                         placeholder="Phone number"
+                    />
+                    
+                    <Select
+                        ref={ref}
+                        accessor="role"
+                        options={{
+                            user: { label: 'User' },
+                            admin: { label: 'Admin' },
+                        }}
                     />
                 </form>
                 
