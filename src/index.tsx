@@ -68,7 +68,6 @@ export const test = () => {
             permissions: [],
         });
         
-        const Select = SelectFor(Form.FormContext);
         const ref = React.useRef(null);
         // @ts-ignore
         window.ref = ref;
@@ -79,31 +78,45 @@ export const test = () => {
                 updateBuffer={setBuffer}
             >
                 <form
-                    //onSubmit={() => { submit(); }}
+                    id="form2"
+                    onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
+                        evt.preventDefault();
+                        console.log('submit2', evt);
+                        //submit();
+                    }}
+                />
+                
+                <form
+                    onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
+                        evt.preventDefault();
+                        console.log('submit1', evt);
+                        //submit();
+                    }}
                 >
-                    <Form.InputTextField
+                    <Form.Text
                         accessor={O.optic<User>().prop('name')}
                         className="name"
                         placeholder="Name"
+                        form="form2"
                     />
                     
-                    <Form.InputTextField
+                    <Form.Text
                         accessor={Form.accessor.path('contact.address')}
                         className={{ address: true }}
                         placeholder="Address"
                     />
                     
-                    <Form.InputTextField
+                    <Form.Text
                         accessor={['contact', 'postalCode']}
                         placeholder="Postal code"
                     />
                     
-                    <Form.InputTextField
+                    <Form.Text
                         accessor="contact.phoneNumber"
                         placeholder="Phone number"
                     />
                     
-                    <Select
+                    <Form.Select
                         ref={ref}
                         accessor="role"
                         options={{
@@ -111,6 +124,9 @@ export const test = () => {
                             admin: { label: 'Admin' },
                         }}
                     />
+                    
+                    <button type="submit">Submit</button>
+                    <button type="submit" form="form2">Submit 2</button>
                 </form>
                 
                 <pre>

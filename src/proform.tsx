@@ -9,36 +9,9 @@ import * as Ctx from './FormContext.js';
 import { AccessorProp, useAccessorFor } from './Accessor.js';
 import type { FieldBufferProps } from './components/Field.js';
 
+import { TextFor } from './components/Text.js';
+import { SelectFor } from './components/Select.js';
 
-type InputTextProps = ComponentPropsWithoutRef<'input'> & FieldBufferProps<string>;
-const InputText = ({ buffer, updateBuffer, ...props }: InputTextProps) => {
-    return (
-        <input
-            type="text"
-            value={buffer}
-            {...props}
-            className={cx(props.className)}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-                updateBuffer(evt.target.value);
-                
-                // Call user-defined `onChange`, if any
-                if (typeof props.onChange === 'function') { props.onChange(evt); }
-            }}
-        />
-    );
-};
-
-type InputTextFieldProps<A> = Omit<InputTextProps, keyof FieldBufferProps<string>> & {
-    accessor: AccessorProp<A, string>,
-};
-const InputTextField = <A,>(FormContext: Ctx.FormContext<A>) => ({ accessor, ...props }: InputTextFieldProps<A>) => {
-    const useAccessor = React.useMemo(() => useAccessorFor(FormContext), []);
-    
-    const { buffer: inputBuffer, updateBuffer: updateInputBuffer } = useAccessor(accessor);
-    return (
-        <InputText {...props} buffer={inputBuffer} updateBuffer={updateInputBuffer}/>
-    );
-};
 
 export const makeForm = <A,>() => {
     const { FormContext, FormProvider, useForm } = Ctx.createFormContext<A>();
@@ -84,7 +57,7 @@ export const makeForm = <A,>() => {
         //Field,
         
         // Field components
-        InputText,
-        InputTextField: InputTextField(FormContext),
+        Text: TextFor(FormContext),
+        Select: SelectFor(FormContext),
     };
 };

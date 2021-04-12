@@ -1,5 +1,8 @@
 
+import { generateRandomId } from './util/random.js';
+
 import * as React from 'react';
+
 
 /*
 Design notes:
@@ -62,7 +65,11 @@ type FormProviderProps<A> = {
 export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: FormProviderProps<A>) => {
     const { buffer, updateBuffer, children } = props;
     
+    const formId = React.useMemo<string>(generateRandomId, []);
+    
     const formContext = React.useMemo<FormContextState<A>>(() => ({
+        formId,
+        
         buffer,
         //meta: buffer as Meta<A>,
         
@@ -74,20 +81,30 @@ export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: For
     
     return (
         <FormContext.Provider value={formContext}>
+            <form
+                id={formId}
+                onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
+                    evt.preventDefault();
+                    console.log('submit', evt);
+                    //submit();
+                }}
+            />
+            
             {children}
         </FormContext.Provider>
     );
 };
 
-export const makeUseForm = <A,>(FormContext: FormContext<A>) => (): FormContextState<A> => {
-    const context = React.useContext(FormContext);
-    
-    if (context === null) {
-        throw new Error(`Missing FormProvider. There should be a <FormProvider> ancestor element.`);
-    }
-    
-    return context;
-};
+export const makeUseForm = <A,>(FormContext: FormContext<A>) =>
+    function useForm(): FormContextState<A> { // Named function for DevTools
+        const context = React.useContext(FormContext);
+        
+        if (context === null) {
+            throw new Error(`Missing FormProvider. There should be a <FormProvider> ancestor element.`);
+        }
+        
+        return context;
+    };
 // Shorthand version for direct use in a component
 export const useForm = <A,>(FormContext: FormContext<A>): FormContextState<A> => {
     // Note: `FormContext` should not change, so is not included as dependency

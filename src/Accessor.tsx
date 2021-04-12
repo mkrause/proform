@@ -28,24 +28,24 @@ const parseAccessor = <A, F>(accessor: AccessorProp<A, F>) => {
 };
 
 // Hook to get the result of an accessor in the current form context
-export const useAccessorFor = <A,>(FormContext: Ctx.FormContext<A>) => <F,>(accessor: AccessorProp<A, F>) => {
-    const context = Ctx.useForm(FormContext);
-    
-    const accessorParsed: Accessor<A, F> = parseAccessor(accessor);
-    
-    type FieldBuffer = AccessorResult<typeof accessorParsed>;
-    
-    const buffer = React.useMemo(
-        () => O.get(accessorParsed)(context.buffer),
-        [context.buffer, accessorParsed]
-    );
-    const updateBuffer = React.useCallback((fieldBufferUpdated: FieldBuffer) =>
-        context.methods.updateBuffer((buffer: A) => O.set(accessorParsed)(fieldBufferUpdated)(context.buffer)),
-        [context.buffer, accessorParsed],
-    );
-    
-    return { buffer, updateBuffer };
-};
+export const useAccessorFor = <A,>(FormContext: Ctx.FormContext<A>) =>
+    function useAccessor<F,>(accessor: AccessorProp<A, F>) { // Named function for DevTools
+        const context = Ctx.useForm(FormContext);
+        
+        const accessorParsed: Accessor<A, F> = parseAccessor(accessor);
+        
+        type FieldBuffer = AccessorResult<typeof accessorParsed>;
+        const buffer = React.useMemo(
+            () => O.get(accessorParsed)(context.buffer),
+            [context.buffer, accessorParsed]
+        );
+        const updateBuffer = React.useCallback((fieldBufferUpdated: FieldBuffer) =>
+            context.methods.updateBuffer((buffer: A) => O.set(accessorParsed)(fieldBufferUpdated)(context.buffer)),
+            [context.buffer, accessorParsed],
+        );
+        
+        return { buffer, updateBuffer };
+    };
 
 export const ConnectAccessor = <F, P extends FieldBufferProps<F>>(Component: React.ComponentType<P>) =>
     <A,>(FormContext: Ctx.FormContext<A>) => {
