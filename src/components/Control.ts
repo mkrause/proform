@@ -1,5 +1,5 @@
 
-export type FieldBufferProps<F> = {
+export type ControlBufferProps<F> = {
     buffer: F,
     updateBuffer: (bufferUpdated: F) => void,
 };

@@ -40,6 +40,8 @@ type Updater<T> = T | ((value: T) => T);
 
 // The form context (i.e. the value of the React context)
 export type FormContextState<A> = {
+    formId?: string,
+    
     buffer: A,
     //meta: Overlay<A, MetaItem>,
     
@@ -47,6 +49,7 @@ export type FormContextState<A> = {
     methods: {
       updateBuffer: (buffer: Updater<A>) => void,
       //updateMeta: (meta: Updater<Meta<A>>) => void,
+      submit: () => Promise<void>,
     },
 };
 
@@ -60,15 +63,28 @@ export const makeFormContext = <A,>(): FormContext<A> => {
 type FormProviderProps<A> = {
     buffer: A,
     updateBuffer: FormContextState<A>['methods']['updateBuffer'],
+    nestable?: boolean,
+    id?: string,
+    onSubmit: (buffer: A) => void | Promise<void>,
     children: React.ReactNode,
 };
 export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: FormProviderProps<A>) => {
-    const { buffer, updateBuffer, children } = props;
+    const { buffer, updateBuffer, nestable = false, id, onSubmit, children } = props;
     
-    const formId = React.useMemo<string>(generateRandomId, []);
+    const formId = React.useMemo<null | string>(
+        () => {
+            if (!nestable) { return null; }
+            return id ?? generateRandomId();
+        },
+        [nestable, id],
+    );
+    
+    const submit = React.useCallback<FormContextState<A>['methods']['submit']>(async () => {
+        await onSubmit(buffer);
+    }, [buffer, onSubmit]);
     
     const formContext = React.useMemo<FormContextState<A>>(() => ({
-        formId,
+        formId: formId ?? undefined,
         
         buffer,
         //meta: buffer as Meta<A>,
@@ -76,20 +92,12 @@ export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: For
         methods: {
             updateBuffer,
             //updateMeta: () => {},
+            submit,
         },
-    }), [buffer, updateBuffer]);
+    }), [buffer, updateBuffer, formId, submit]);
     
     return (
         <FormContext.Provider value={formContext}>
-            <form
-                id={formId}
-                onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
-                    evt.preventDefault();
-                    console.log('submit', evt);
-                    //submit();
-                }}
-            />
-            
             {children}
         </FormContext.Provider>
     );

@@ -2,7 +2,7 @@
 import { classNames as cx, ComponentPropsWithRef } from '../util/components.js';
 import * as React from 'react';
 
-import type { FieldBufferProps } from './Field.js';
+import type { ControlBufferProps } from '../components/Control.js';
 import { ConnectAccessor } from '../Accessor.js';
 
 
@@ -11,11 +11,12 @@ export type Option = {
     label: string,
 };
 
-type SelectT = string; // Underlying data type
-type SelectProps = ComponentPropsWithRef<'select'> & FieldBufferProps<SelectT> & {
+type SelectBuffer = string;
+
+type SelectControlProps = ComponentPropsWithRef<'select'> & ControlBufferProps<SelectBuffer> & {
     options: Record<OptionKey, Option>,
 };
-export const Select = React.forwardRef<HTMLSelectElement, SelectProps>((props, ref) => {
+export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlProps>((props, ref) => {
     const { buffer, updateBuffer, options, ...propsRest } = props;
     
     const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,6 +41,6 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>((props, r
         </select>
     );
 });
-Select.displayName = 'Select';
+SelectControl.displayName = 'SelectControl';
 
-export const SelectFor = ConnectAccessor<SelectT, React.ComponentPropsWithoutRef<typeof Select>>(Select);
+export const connectSelect = ConnectAccessor<SelectBuffer, SelectControlProps>(SelectControl);

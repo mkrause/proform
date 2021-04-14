@@ -5,7 +5,7 @@ import type { DottedPath } from 'optics-ts/dist/lib/utils';
 import * as React from 'react';
 
 import * as Ctx from './FormContext.js';
-import type { FieldBufferProps } from './components/Field.js';
+import type { ControlBufferProps } from './components/Control.js';
 
 
 //type RenderProp<P, C extends React.ReactNode = React.ReactNode> = C | ((props: P) => C);
@@ -41,23 +41,24 @@ export const useAccessorFor = <A,>(FormContext: Ctx.FormContext<A>) =>
         );
         const updateBuffer = React.useCallback((fieldBufferUpdated: FieldBuffer) =>
             context.methods.updateBuffer((buffer: A) => O.set(accessorParsed)(fieldBufferUpdated)(context.buffer)),
-            [context.buffer, accessorParsed],
+            [context.buffer, context.methods.updateBuffer, accessorParsed],
         );
         
         return { buffer, updateBuffer };
     };
 
-export const ConnectAccessor = <F, P extends FieldBufferProps<F>>(Component: React.ComponentType<P>) =>
+export const ConnectAccessor = <F, P extends ControlBufferProps<F>>(Component: React.ComponentType<P>) =>
     <A,>(FormContext: Ctx.FormContext<A>) => {
         type ElementRefT = React.ElementRef<typeof Component>;
         type RefT = React.PropsWithRef<P> extends { ref?: infer R } ? R : never;
-        type PropsT = Omit<React.PropsWithoutRef<P>, keyof FieldBufferProps<F>> & {
+        type PropsT = Omit<React.PropsWithoutRef<P>, keyof ControlBufferProps<F>> & {
             accessor: AccessorProp<A, F>,
         };
         
         const forwarder: React.ForwardRefRenderFunction<ElementRefT, PropsT> = ({ accessor, ...props }, ref) => {
             const useAccessor = React.useMemo(() => useAccessorFor(FormContext), []);
             
+            const { formId } = Ctx.useForm(FormContext);
             const { buffer, updateBuffer } = useAccessor(accessor);
             
             // Note: TS will complain that `P` may be instantiated with a different subtype of `FieldBufferProps<F>`.
@@ -65,7 +66,7 @@ export const ConnectAccessor = <F, P extends FieldBufferProps<F>>(Component: Rea
             // @ts-ignore
             const propsWithRef: P = { ref, ...props, buffer, updateBuffer };
             return (
-                <Component {...propsWithRef}/>
+                <Component {...propsWithRef} form={formId}/>
             );
         };
         const displayName = `ProformConnect(${Component.displayName ?? 'Anonymous'})`;

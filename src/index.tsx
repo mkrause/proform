@@ -4,8 +4,6 @@ import * as React from 'react';
 //import * as Ctx from './FormContext.js';
 import * as Proform from './proform.js';
 
-import { SelectFor } from './components/Select.js';
-
 
 
 // const FormContextGeneric = Ctx.createFormContext<unknown>();
@@ -74,61 +72,50 @@ export const test = () => {
         
         return (
             <Form.FormProvider
+                //nestable
                 buffer={buffer}
                 updateBuffer={setBuffer}
+                onSubmit={(user: User) => {
+                    console.log('submit', user);
+                }}
             >
-                <form
-                    id="form2"
-                    onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
-                        evt.preventDefault();
-                        console.log('submit2', evt);
-                        //submit();
-                    }}
-                />
-                
-                <form
-                    onSubmit={(evt: React.FormEvent<HTMLFormElement>) => {
-                        evt.preventDefault();
-                        console.log('submit1', evt);
-                        //submit();
-                    }}
-                >
-                    <Form.Text
-                        accessor={O.optic<User>().prop('name')}
-                        className="name"
-                        placeholder="Name"
-                        form="form2"
-                    />
-                    
-                    <Form.Text
-                        accessor={Form.accessor.path('contact.address')}
-                        className={{ address: true }}
-                        placeholder="Address"
-                    />
-                    
-                    <Form.Text
-                        accessor={['contact', 'postalCode']}
-                        placeholder="Postal code"
-                    />
-                    
-                    <Form.Text
-                        accessor="contact.phoneNumber"
-                        placeholder="Phone number"
-                    />
-                    
-                    <Form.Select
-                        ref={ref}
-                        accessor="role"
-                        options={{
-                            user: { label: 'User' },
-                            admin: { label: 'Admin' },
-                        }}
-                    />
-                    
-                    <button type="submit">Submit</button>
-                    <button type="submit" form="form2">Submit 2</button>
-                </form>
-                
+                <Form.Form>
+                    <div className="form">
+                        <Form.Text
+                            accessor={O.optic<User>().prop('name')}
+                            className="name"
+                            placeholder="Name"
+                            form="form2"
+                        />
+                        
+                        <Form.Text
+                            accessor={Form.accessor.path('contact.address')}
+                            className={{ address: true }}
+                            placeholder="Address"
+                        />
+                        
+                        <Form.Text
+                            accessor={['contact', 'postalCode']}
+                            placeholder="Postal code"
+                        />
+                        
+                        <Form.Text
+                            accessor="contact.phoneNumber"
+                            placeholder="Phone number"
+                        />
+                        
+                        <Form.Select
+                            ref={ref}
+                            accessor="role"
+                            options={{
+                                user: { label: 'User' },
+                                admin: { label: 'Admin' },
+                            }}
+                        />
+                        
+                        <button type="submit">Submit</button>
+                    </div>
+                </Form.Form>
                 <pre>
                     {JSON.stringify(buffer, null, 2)}
                 </pre>

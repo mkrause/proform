@@ -7,10 +7,11 @@ import * as React from 'react';
 
 import * as Ctx from './FormContext.js';
 import { AccessorProp, useAccessorFor } from './Accessor.js';
-import type { FieldBufferProps } from './components/Field.js';
+import type { ControlBufferProps } from './components/Control.js';
 
-import { TextFor } from './components/Text.js';
-import { SelectFor } from './components/Select.js';
+import { connectText } from './controls/Text.js';
+import { connectSelect } from './controls/Select.js';
+import { connectForm, connectFormNested } from './components/Form.js';
 
 
 export const makeForm = <A,>() => {
@@ -54,10 +55,13 @@ export const makeForm = <A,>() => {
         accessor: O.optic<A>(),
         path: O.optic<A>().path.bind(O.optic<A>()),
         
+        // Components
+        Form: connectForm(FormContext),
+        FormNested: connectFormNested(FormContext),
         //Field,
         
         // Field components
-        Text: TextFor(FormContext),
-        Select: SelectFor(FormContext),
+        Text: connectText(FormContext),
+        Select: connectSelect(FormContext),
     };
 };
