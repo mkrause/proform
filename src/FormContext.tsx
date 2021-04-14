@@ -3,6 +3,8 @@ import { generateRandomId } from './util/random.js';
 
 import * as React from 'react';
 
+import type { Accessor } from './Accessor.js';
+
 
 /*
 Design notes:
@@ -60,16 +62,26 @@ export const makeFormContext = <A,>(): FormContext<A> => {
     return React.createContext<null | FormContextState<A>>(null);
 };
 
-type FormProviderProps<A> = {
+export type ValidationError = string;
+export type FormProviderProps<A> = { // Note: exported so we can get the type without first needing a FormContext
     buffer: A,
     updateBuffer: FormContextState<A>['methods']['updateBuffer'],
     nestable?: boolean,
     id?: string,
     onSubmit: (buffer: A) => void | Promise<void>,
+    validate?: (buffer: A) => Map<Accessor<A, any>, ValidationError>,
     children: React.ReactNode,
 };
 export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: FormProviderProps<A>) => {
-    const { buffer, updateBuffer, nestable = false, id, onSubmit, children } = props;
+    const {
+        buffer,
+        updateBuffer,
+        nestable = false,
+        id,
+        onSubmit,
+        validate = () => { return new Map(); },
+        children,
+    } = props;
     
     const formId = React.useMemo<null | string>(
         () => {
@@ -80,6 +92,13 @@ export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: For
     );
     
     const submit = React.useCallback<FormContextState<A>['methods']['submit']>(async () => {
+        const errors = validate(buffer);
+        
+        if (errors.size > 0) {
+            console.error(errors);
+            return;
+        }
+        
         await onSubmit(buffer);
     }, [buffer, onSubmit]);
     

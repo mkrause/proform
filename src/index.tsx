@@ -53,7 +53,7 @@ export const test = () => {
         permissions: Array<UserPermission>,
     };
     
-    const Form = Proform.makeForm<User>();
+    //const Form = Proform.makeForm<User>();
     const TestApp = () => {
         const [buffer, setBuffer] = React.useState<User>({
             name: '',
@@ -66,6 +66,20 @@ export const test = () => {
             permissions: [],
         });
         
+        const Form = Proform.useFormProvider<User>();
+        
+        const validate = React.useCallback<Proform.FormValidate<User>>((user: User) => {
+            const errors = new Map();
+            
+            if (user.name.trim() === '') { errors.set(O.optic<User>().prop('name'), 'Name is required'); }
+            
+            return errors;
+        }, []);
+        
+        const handleSubmit = React.useCallback<Proform.FormSubmit<User>>(async (user: User) => {
+            console.log('submit', user);
+        }, []);
+        
         const ref = React.useRef(null);
         // @ts-ignore
         window.ref = ref;
@@ -75,9 +89,8 @@ export const test = () => {
                 //nestable
                 buffer={buffer}
                 updateBuffer={setBuffer}
-                onSubmit={(user: User) => {
-                    console.log('submit', user);
-                }}
+                validate={validate}
+                onSubmit={handleSubmit}
             >
                 <Form.Form>
                     <div className="form">
@@ -85,7 +98,7 @@ export const test = () => {
                             accessor={O.optic<User>().prop('name')}
                             className="name"
                             placeholder="Name"
-                            form="form2"
+                            aria-label="Name"
                         />
                         
                         <Form.Text

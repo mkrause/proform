@@ -65,3 +65,13 @@ export const makeForm = <A,>() => {
         Select: connectSelect(FormContext),
     };
 };
+
+export const useFormProvider = <A,>() => {
+    const Form = React.useMemo(() => makeForm<A>(), []);
+    return Form;
+};
+
+
+// Utility types
+export type FormSubmit<A> = Ctx.FormProviderProps<A>['onSubmit'];
+export type FormValidate<A> = Required<Ctx.FormProviderProps<A>>['validate'];
