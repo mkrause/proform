@@ -254,7 +254,6 @@ export const test = () => {
                             
                             <label className="field">
                                 <Form.Select
-                                    ref={ref}
                                     accessor="contact.legalEntityType"
                                     options={{
                                         private: { label: 'Private' },
