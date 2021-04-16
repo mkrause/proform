@@ -12,6 +12,7 @@ import type { ControlBufferProps } from './components/Control.js';
 import { connectText } from './controls/Text.js';
 import { connectSelect } from './controls/Select.js';
 import { connectForm, connectFormNested } from './components/Form.js';
+import { connectValidationMessage } from './components/ValidationMessage.js';
 
 
 export const makeForm = <A,>() => {
@@ -63,6 +64,9 @@ export const makeForm = <A,>() => {
         // Field components
         Text: connectText(FormContext),
         Select: connectSelect(FormContext),
+        
+        // Validation
+        ValidationMessage: connectValidationMessage(FormContext),
     };
 };
 

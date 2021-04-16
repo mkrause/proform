@@ -1,5 +1,6 @@
 
 import { generateRandomId } from './util/random.js';
+import * as O from 'optics-ts';
 
 import * as React from 'react';
 
@@ -41,11 +42,13 @@ type Meta<A> = Overlay<A, MetaItem>;
 type Updater<T> = T | ((value: T) => T);
 
 // The form context (i.e. the value of the React context)
+export type Validation<A> = Overlay<A, Error>;
 export type FormContextState<A> = {
     formId?: string,
     
     buffer: A,
     //meta: Overlay<A, MetaItem>,
+    validation: null | Validation<A>,
     
     // Note: wrapping these in `methods` allows us to get just the data part with `Omit<FormContextState, 'methods>`
     methods: {
@@ -62,7 +65,26 @@ export const makeFormContext = <A,>(): FormContext<A> => {
     return React.createContext<null | FormContextState<A>>(null);
 };
 
-export type ValidationError = string;
+export type ValidationError = Error;
+export type ValidationErrors<A> = Map<Accessor<A, unknown>, string>;
+const validationFromErrors = <A,>(buffer: A, errors: ValidationErrors<A>): null | Validation<A> => {
+    if (errors.size === 0) {
+        return null;
+    }
+    
+    let validation = buffer as Validation<A>;
+    errors.forEach((error, accessor) => {
+        try {
+            validation = O.set<Validation<A>, any, any>(accessor)(new Error(error))(validation);
+        } catch (e) {
+            console.error(`Invalid accessor found`);
+            // Ignore
+        }
+    });
+    
+    return validation;
+};
+
 export type FormProviderProps<A> = { // Note: exported so we can get the type without first needing a FormContext
     buffer: A,
     updateBuffer: FormContextState<A>['methods']['updateBuffer'],
@@ -91,29 +113,33 @@ export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: For
         [nestable, id],
     );
     
+    const validation = React.useMemo<null | Validation<A>>(
+        () => validationFromErrors(buffer, validate(buffer)),
+        [buffer, validate],
+    );
+    
     const submit = React.useCallback<FormContextState<A>['methods']['submit']>(async () => {
-        const errors = validate(buffer);
-        
-        if (errors.size > 0) {
-            console.error(errors);
+        if (validation !== null) {
+            console.log('validation', validation);
             return;
         }
         
         await onSubmit(buffer);
-    }, [buffer, onSubmit]);
+    }, [onSubmit, buffer, validation]);
     
     const formContext = React.useMemo<FormContextState<A>>(() => ({
         formId: formId ?? undefined,
         
         buffer,
         //meta: buffer as Meta<A>,
+        validation,
         
         methods: {
             updateBuffer,
             //updateMeta: () => {},
             submit,
         },
-    }), [buffer, updateBuffer, formId, submit]);
+    }), [buffer, updateBuffer, formId, validation, submit]);
     
     return (
         <FormContext.Provider value={formContext}>

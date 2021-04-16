@@ -28,7 +28,20 @@
             display: none !important;
         }
         
+        .validation-message {
+            margin-top: -1rem;
+            --line-height: 1.6em;
+            line-height: var(--line-height);
+            font-size: 1.2rem;
+            color: indianred;
+        }
+        .validation-message:empty {
+            display: block;
+            height: var(--line-height);
+        }
+        
         input[type], select {
+            margin: 0 !important;
             padding: 0.8rem 1rem;
             font-size: 0.9em;
         }

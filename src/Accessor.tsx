@@ -16,7 +16,7 @@ export type AccessorResult<L extends Accessor<any, any>> = L extends Accessor<un
 export type AccessorProp<A, F> = PropertyKey | Array<PropertyKey> | Accessor<A, F>; // Accessor, or a path (string)
 //const isPath = <A,>(path: unknown): path is DottedPath<A, string> => typeof path === 'string';
 
-const parseAccessor = <A, F>(accessor: AccessorProp<A, F>) => {
+export const parseAccessor = <A, F>(accessor: AccessorProp<A, F>) => {
     const accessorParsed: Accessor<A, F> =
         typeof accessor === 'string' || typeof accessor === 'number' || typeof accessor === 'symbol'
             ? (O.optic<A>().path(accessor) as unknown as Accessor<A, F>)
