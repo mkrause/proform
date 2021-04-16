@@ -23,6 +23,8 @@ export const connectForm = <A,>(FormContext: FormContext<A>) => {
         return (
             <form
                 ref={ref}
+                method="post"
+                action=""
                 {...props}
                 id={formId}
                 className={cx(props.className)}

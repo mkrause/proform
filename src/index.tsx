@@ -1,9 +1,12 @@
 
 import * as React from 'react';
 
+import { classNames as cx, ComponentPropsWithoutRef } from './util/components.js';
+
 //import * as Ctx from './FormContext.js';
 import * as Proform from './proform.js';
 
+import type { FieldProps } from './components/Field.js';
 import type { ValidationMessageProps } from './components/ValidationMessage.js';
 
 
@@ -42,30 +45,35 @@ type Test = O.OpticFor<42>;
 */
 
 export const test = () => {
-    type UserRole = 'user' | 'admin';
-    type UserPermission = 'view' | 'edit' | 'manage';
+    //type UserRole = 'user' | 'admin';
+    type LegalEntityType = 'private' | 'business';
+    type UserInterest = 'music' | 'culture' | 'politics' | 'science' | 'tech';
     type User = {
+        //role: UserRole,
         name: string,
+        email: string,
         contact: {
+            legalEntityType: LegalEntityType,
             address: string,
             postalCode: string,
             phoneNumber: string,
         },
-        role: UserRole,
-        permissions: Array<UserPermission>,
+        interests: Array<UserInterest>,
     };
     
     //const Form = Proform.makeForm<User>();
     const TestApp = () => {
         const [buffer, setBuffer] = React.useState<User>({
+            //role: 'user',
             name: '',
+            email: '',
             contact: {
+                legalEntityType: 'private',
                 address: '',
                 postalCode: '',
                 phoneNumber: '',
             },
-            role: 'user',
-            permissions: [],
+            interests: [],
         });
         
         const Form = Proform.useFormProvider<User>();
@@ -93,6 +101,12 @@ export const test = () => {
                 errors.set(_.path('contact.phoneNumber'), 'Invalid phone number');
             }
             
+            if (user.email.trim() === '') {
+                errors.set(_.prop('email'), 'Email address is required');
+            } else if (!/@/.test(user.email)) {
+                errors.set(_.prop('email'), 'Invalid email address');
+            }
+            
             return errors;
         }, []);
         
@@ -100,17 +114,64 @@ export const test = () => {
             console.log('submit', user);
         }, []);
         
-        const ref = React.useRef(null);
-        // @ts-ignore
-        window.ref = ref;
+        const ValidationMessage = React.useCallback(Object.assign(
+            <A, F>({ visible = true, ...props }: ValidationMessageProps<A, F> & { visible?: boolean }) =>
+                <Form.ValidationMessage {...props}>
+                    {({ error }) =>
+                        <span className="validation-message">
+                            {error !== null && visible &&
+                                error.message
+                            }
+                        </span>
+                    }
+                </Form.ValidationMessage>,
+                { displayName: 'ValidationMessage' },
+            ),
+            [],
+        );
         
-        const ValidationMessage = React.useCallback(<A, F>(props: ValidationMessageProps<A, F>) =>
-            <Form.ValidationMessage {...props}>
-                {({ error }) =>
-                    <span className="validation-message">{error && error.message}</span>
-                }
-            </Form.ValidationMessage>,
-            []
+        type TextFieldProps<A> = FieldProps<A, string> & {
+            labelProps?: ComponentPropsWithoutRef<'label'>,
+            controlProps?: Omit<React.ComponentPropsWithRef<typeof Form.Text>, 'accessor'>,
+        };
+        const TextField = React.useCallback(Object.assign(
+            <A,>({ labelProps = {}, controlProps = {}, ...props }: TextFieldProps<A>) =>
+                <Form.Field<string> {...props}>
+                    {({ accessor, touched, setTouched }) => {
+                        const [focused, setFocused] = React.useState<boolean>(false);
+                        const validationError = Form.useValidation(accessor);
+                        return (
+                            <label {...labelProps}
+                                className={cx('field',
+                                    { 'field--valid': (touched || focused) && validationError === null },
+                                    { 'field--invalid': (touched || focused) && validationError !== null },
+                                    labelProps.className,
+                                )}
+                            >
+                                <span className="input-text">
+                                    <Form.Text
+                                        accessor={accessor}
+                                        {...controlProps}
+                                        onFocus={() => {
+                                            setFocused(true);
+                                        }}
+                                        onBlur={() => {
+                                            setTouched(true);
+                                            setFocused(false);
+                                        }}
+                                    />
+                                </span>
+                                <ValidationMessage
+                                    accessor={accessor}
+                                    visible={touched && !focused}
+                                />
+                            </label>
+                        );
+                    }}
+                </Form.Field>,
+                { displayName: 'TextField' },
+            ),
+            [],
         );
         
         return (
@@ -123,15 +184,18 @@ export const test = () => {
             >
                 <Form.Form>
                     <div className="form">
-                        <Form.Text
-                            accessor={O.optic<User>().prop('name')}
-                            className="name"
-                            placeholder="Name"
-                            aria-label="Name"
-                        />
-                        <ValidationMessage
-                            accessor={O.optic<User>().prop('name')}
-                        />
+                        {/*
+                        <Form.Field accessor={O.optic<User>().prop('name')}>
+                            <Form.Text
+                                accessor={O.optic<User>().prop('name')}
+                                className="name"
+                                placeholder="Name"
+                                aria-label="Name"
+                            />
+                            <ValidationMessage
+                                accessor={O.optic<User>().prop('name')}
+                            />
+                        </Form.Field>
                         
                         <Form.Text
                             accessor={Form.accessor.path('contact.address')}
@@ -168,6 +232,74 @@ export const test = () => {
                         />
                         <ValidationMessage
                             accessor="role"
+                        />
+                        */}
+                        
+                        <TextField
+                            accessor="name"
+                            controlProps={{
+                                placeholder: 'Name',
+                            }}
+                        />
+                        
+                        <TextField
+                            accessor="email"
+                            controlProps={{
+                                placeholder: 'Email address',
+                            }}
+                        />
+                        
+                        <fieldset>
+                            <legend>Contact information</legend>
+                            
+                            <label className="field">
+                                <Form.Select
+                                    ref={ref}
+                                    accessor="contact.legalEntityType"
+                                    options={{
+                                        private: { label: 'Private' },
+                                        business: { label: 'Business' },
+                                    }}
+                                />
+                                <ValidationMessage
+                                    accessor="contact.legalEntityType"
+                                />
+                            </label>
+                            
+                            <TextField
+                                accessor="contact.address"
+                                controlProps={{
+                                    placeholder: 'Address',
+                                }}
+                            />
+                            
+                            <TextField
+                                accessor="contact.postalCode"
+                                controlProps={{
+                                    placeholder: 'Postal code',
+                                }}
+                            />
+                            
+                            <TextField
+                                accessor="contact.phoneNumber"
+                                controlProps={{
+                                    placeholder: 'Phone number (optional)',
+                                }}
+                            />
+                        </fieldset>
+                        
+                        <Form.Select
+                            accessor="interests"
+                            options={{
+                                'music': { label: 'Music' },
+                                'culture': { label: 'Culture' },
+                                'politics': { label: 'Politics' },
+                                'science': { label: 'Science' },
+                                'tech': { label: 'Tech' },
+                            }}
+                        />
+                        <ValidationMessage
+                            accessor="interests"
                         />
                         
                         <button type="submit">Submit</button>

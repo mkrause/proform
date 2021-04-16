@@ -94,59 +94,60 @@ export type FormProviderProps<A> = { // Note: exported so we can get the type wi
     validate?: (buffer: A) => Map<Accessor<A, any>, ValidationError>,
     children: React.ReactNode,
 };
-export const makeFormProvider = <A,>(FormContext: FormContext<A>) => (props: FormProviderProps<A>) => {
-    const {
-        buffer,
-        updateBuffer,
-        nestable = false,
-        id,
-        onSubmit,
-        validate = () => { return new Map(); },
-        children,
-    } = props;
-    
-    const formId = React.useMemo<null | string>(
-        () => {
-            if (!nestable) { return null; }
-            return id ?? generateRandomId();
-        },
-        [nestable, id],
-    );
-    
-    const validation = React.useMemo<null | Validation<A>>(
-        () => validationFromErrors(buffer, validate(buffer)),
-        [buffer, validate],
-    );
-    
-    const submit = React.useCallback<FormContextState<A>['methods']['submit']>(async () => {
-        if (validation !== null) {
-            console.log('validation', validation);
-            return;
-        }
-        
-        await onSubmit(buffer);
-    }, [onSubmit, buffer, validation]);
-    
-    const formContext = React.useMemo<FormContextState<A>>(() => ({
-        formId: formId ?? undefined,
-        
-        buffer,
-        //meta: buffer as Meta<A>,
-        validation,
-        
-        methods: {
+export const makeFormProvider = <A,>(FormContext: FormContext<A>) =>
+    function FormProvider(props: FormProviderProps<A>) {
+        const {
+            buffer,
             updateBuffer,
-            //updateMeta: () => {},
-            submit,
-        },
-    }), [buffer, updateBuffer, formId, validation, submit]);
-    
-    return (
-        <FormContext.Provider value={formContext}>
-            {children}
-        </FormContext.Provider>
-    );
-};
+            nestable = false,
+            id,
+            onSubmit,
+            validate = () => { return new Map(); },
+            children,
+        } = props;
+        
+        const formId = React.useMemo<null | string>(
+            () => {
+                if (!nestable) { return null; }
+                return id ?? generateRandomId();
+            },
+            [nestable, id],
+        );
+        
+        const validation = React.useMemo<null | Validation<A>>(
+            () => validationFromErrors(buffer, validate(buffer)),
+            [buffer, validate],
+        );
+        
+        const submit = React.useCallback<FormContextState<A>['methods']['submit']>(async () => {
+            if (validation !== null) {
+                console.log('errors', validation);
+                return;
+            }
+            
+            await onSubmit(buffer);
+        }, [onSubmit, buffer, validation]);
+        
+        const formContext = React.useMemo<FormContextState<A>>(() => ({
+            formId: formId ?? undefined,
+            
+            buffer,
+            //meta: buffer as Meta<A>,
+            validation,
+            
+            methods: {
+                updateBuffer,
+                //updateMeta: () => {},
+                submit,
+            },
+        }), [buffer, updateBuffer, formId, validation, submit]);
+        
+        return (
+            <FormContext.Provider value={formContext}>
+                {children}
+            </FormContext.Provider>
+        );
+    };
 
 export const makeUseForm = <A,>(FormContext: FormContext<A>) =>
     function useForm(): FormContextState<A> { // Named function for DevTools

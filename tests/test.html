@@ -15,6 +15,16 @@
     <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura-dark.css" type="text/css">
     
     <style>
+        pre {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin: 1.5rem;
+            width: 500px;
+            white-space: pre-wrap;
+            line-break: anywhere;
+        }
+        
         form, .form {
             max-width: 50rem;
             padding: 2rem 0;
@@ -29,15 +39,25 @@
         }
         
         .validation-message {
-            margin-top: -1rem;
             --line-height: 1.6em;
+            
+            /* FIXME: https://css-tricks.com/how-to-tame-line-height-in-css/ */
+            min-height: calc(var(--line-height) + 1px); /* Hack correction for line-height/height discrepancy */
+            
             line-height: var(--line-height);
             font-size: 1.2rem;
             color: indianred;
+            
+            overflow: hidden;
+            opacity: 1;
+            transform: translate(0, 0);
+            transition: opacity 120ms ease-in, transform 120ms ease-in;
         }
         .validation-message:empty {
             display: block;
+            opacity: 0;
             height: var(--line-height);
+            transform: translate(0, calc(-0.1 * var(--line-height)));
         }
         
         input[type], select {
@@ -45,6 +65,32 @@
             padding: 0.8rem 1rem;
             font-size: 0.9em;
         }
+        
+        label.field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label.field .input-text {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+        
+        label.field :is(.input-text input[type], select) {
+            flex: 1;
+        }
+        
+        label.field .input-text::after {
+            position: absolute;
+            right: 6px;
+            top: 9px;
+            line-height: 100%;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        label.field--valid .input-text::after { content: '✓'; color: #4caf50; }
+        label.field--invalid .input-text::after { content: '✗'; color: indianred; }
     </style>
 </head>
 <body>
