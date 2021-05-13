@@ -15,18 +15,29 @@
     <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura-dark.css" type="text/css">
     
     <style>
+        body {
+            max-width: unset;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
         pre {
             position: fixed;
             top: 0;
             left: 0;
             margin: 1.5rem;
-            width: 500px;
+            width: 50rem;
+            min-height: 40rem;
+            font-family: Menlo, Monaco, monospace;
+            font-size: 0.9em;
             white-space: pre-wrap;
             line-break: anywhere;
         }
         
         form, .form {
-            max-width: 50rem;
+            max-width: 100rem;
+            margin-left: 30rem;
             padding: 2rem 0;
             
             display: flex;
@@ -97,6 +108,7 @@
     <script type="importmap">
         {
             "imports": {
+                "message-tag": "https://cdn.skypack.dev/message-tag",
                 "react": "https://cdn.skypack.dev/react",
                 "optics-ts": "https://cdn.skypack.dev/optics-ts",
                 "classnames/dedupe": "https://cdn.skypack.dev/classnames/dedupe"

@@ -1,5 +1,8 @@
 
+import type { Updater } from './util/types';
 import { generateRandomId } from './util/random.js';
+
+
 import * as O from 'optics-ts';
 
 import * as React from 'react';
@@ -36,10 +39,6 @@ type Meta<A> = Overlay<A, MetaItem>;
 
 
 
-
-
-// Either a plain value `T` or a function `T => T`. Used to update some value of type `T` in a structure.
-type Updater<T> = T | ((value: T) => T);
 
 // The form context (i.e. the value of the React context)
 export type Validation<A> = Overlay<A, Error>;

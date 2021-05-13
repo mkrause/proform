@@ -1,6 +1,9 @@
 
+import $msg from 'message-tag';
+
+import type { Updater } from './util/types.js';
 import * as O from 'optics-ts';
-import type { DottedPath } from 'optics-ts/dist/lib/utils';
+//import type { DottedPath } from 'optics-ts/dist/lib/utils';
 
 import * as React from 'react';
 
@@ -8,40 +11,203 @@ import * as Ctx from './FormContext.js';
 import type { ControlBufferProps } from './components/Control.js';
 
 
-//type RenderProp<P, C extends React.ReactNode = React.ReactNode> = C | ((props: P) => C);
+type Optional<A> = undefined | A;
+type Maybe<A> = null | A;
 
-export type Accessor<A, F> = O.Lens<A, O.OpticParams, F>;
-export type AccessorResult<L extends Accessor<any, any>> = L extends Accessor<unknown, infer A> ? A : never;
+/*
+Design notes:
+  - Given a data type `S`, an *accessor* on `S` is a descriptor that tells you how to get and/or set a part of `S`.
+  - Accessors are based on profunctor optics (hence the name "*pro*form"):
+    - `Optic<S, A>` is the type of an optic on a *source* `S` with a *focal* type `A`
+    - Optics can be specialized into:
+      - `Lens<S, A>`, which focuses on a single `A` element (focus type `A`)
+      - `Prism<S, A>`, which focuses on zero or one `A` elements (focus type `undefined | A`)
+      - `Traversal<S, A>`, which focuses on zero or more `A` elements (focus type `Array<A>`)
+*/
 
-export type AccessorProp<A, F> = PropertyKey | Array<PropertyKey> | Accessor<A, F>; // Accessor, or a path (string)
-//const isPath = <A,>(path: unknown): path is DottedPath<A, string> => typeof path === 'string';
+type Lens<S, A> = O.Lens<S, O.OpticParams, A>;
+type Prism<S, A> = O.Prism<S, O.OpticParams, A>;
+type Traversal<S, A> = O.Traversal<S, O.OpticParams, A>;
 
-export const parseAccessor = <A, F>(accessor: AccessorProp<A, F>) => {
-    const accessorParsed: Accessor<A, F> =
-        typeof accessor === 'string' || typeof accessor === 'number' || typeof accessor === 'symbol'
-            ? (O.optic<A>().path(accessor) as unknown as Accessor<A, F>)
-            : Array.isArray(accessor)
-                ? (O.optic<A>().path(...accessor) as unknown as Accessor<A, F>) // FIXME
-                : accessor;
-    
-    return accessorParsed;
+type Optic<S, A> = Lens<S, A> | Prism<S, A> | Traversal<S, A>;
+const Optic = O.optic().constructor;
+
+const isLens = (input: unknown): input is O.Lens<unknown, O.OpticParams, unknown> => {
+    return input instanceof Optic && (input as any)._tag === 'Lens';
+};
+const isPrism = (input: unknown): input is O.Prism<unknown, O.OpticParams, unknown> => {
+    return input instanceof Optic && (input as any)._tag === 'Prism';
+};
+const isTraversal = (input: unknown): input is O.Traversal<unknown, O.OpticParams, unknown> => {
+    return input instanceof Optic && (input as any)._tag === 'Traversal';
+};
+const isOptic = (input: unknown): input is Optic<unknown, unknown> => {
+    return isLens(input) || isPrism(input) || isTraversal(input);
 };
 
-// Hook to get the result of an accessor in the current form context
-export const useAccessorFor = <A,>(FormContext: Ctx.FormContext<A>) =>
-    function useAccessor<F,>(accessor: AccessorProp<A, F>) { // Named function for DevTools
+type LensFocus<A> = A;
+// Note: use `undefined` as the empty sentinal value for prisms rather than `null`, because (1) nonexistence in prisms
+// indicates the lack of a property, (2) `A` as a user space type should be able to use `null`, and (3) optics-ts
+// uses it so less type conversion.
+type PrismFocus<A> = Optional<A>;
+type TraversalFocus<A> = Array<A>;
+type OpticFocal<O extends Optic<unknown, any>> = O extends Optic<any, infer A> ? A : never;
+type OpticFocus<O extends Optic<unknown, any>> =
+    O extends { _tag: 'Lens' } ? LensFocus<OpticFocal<O>>
+        : O extends { _tag: 'Prism' } ? PrismFocus<OpticFocal<O>>
+        : O extends { _tag: 'Traversal' } ? TraversalFocus<OpticFocal<O>>
+        : never;
+
+
+type PathList = Array<PropertyKey>;
+type PathDotted = string;
+export type Accessor<S, A> =
+    | Optic<S, A>
+    | keyof S
+    | PathList
+    | PathDotted;
+
+export const parseAccessor = <S, A>(accessor: Accessor<S, A>): Optic<S, A> => {
+    const _ = O.optic<S>();
+    
+    // Note: parsing from non-optic (e.g. string path) lacks the type safety of the optics-ts methods, and we cannot
+    // replicate that type safety here due to the lack of optics-ts internals. Prefer to use the optics-ts methods
+    // instead.
+    if (isOptic(accessor)) {
+        return accessor as Optic<S, A>;
+    } else if (Array.isArray(accessor)) {
+        return _.path(...accessor) as unknown as Optic<S, A>;
+    } else if (typeof accessor === 'string') {
+        return _.path(accessor) as unknown as Optic<S, A>;
+    } else if (typeof accessor === 'number' || typeof accessor === 'symbol') {
+        return _.prop(accessor) as unknown as Optic<S, A>;
+    } else {
+        throw new TypeError($msg`Invalid accessor ${accessor}`);
+    }
+};
+
+
+export type AccessorBufferProps<A> = {
+    buffer: A,
+    updateBuffer: (bufferUpdated: Updater<A>) => void,
+};
+
+export const useLensFor = <S,>(FormContext: Ctx.FormContext<S>) =>
+    // Named function for DevTools
+    function useLens<A,>(lens: Lens<S, A>): AccessorBufferProps<A> {
         const context = Ctx.useForm(FormContext);
         
-        const accessorParsed: Accessor<A, F> = parseAccessor(accessor);
-        
-        type FieldBuffer = AccessorResult<typeof accessorParsed>;
-        const buffer = React.useMemo(
-            () => O.get(accessorParsed)(context.buffer),
-            [context.buffer, accessorParsed]
+        type FieldBuffer = A;
+        const buffer = React.useMemo<FieldBuffer>(
+            () => O.get(lens)(context.buffer),
+            [context.buffer, lens],
         );
-        const updateBuffer = React.useCallback((fieldBufferUpdated: FieldBuffer) =>
-            context.methods.updateBuffer((buffer: A) => O.set(accessorParsed)(fieldBufferUpdated)(context.buffer)),
-            [context.buffer, context.methods.updateBuffer, accessorParsed],
+        const updateBuffer = React.useCallback<(fieldBufferUpdated: Updater<FieldBuffer>) => void>(
+            (fieldBufferUpdated: Updater<FieldBuffer>) => {
+                if (typeof fieldBufferUpdated === 'function') {
+                    // Unsafe cast because the user may pass a function of an invalid type (we cannot check)
+                    const updater = fieldBufferUpdated as (fieldBuffer: FieldBuffer) => void;
+                    return context.methods.updateBuffer(O.modify(lens)(updater));
+                } else {
+                    return context.methods.updateBuffer(O.set(lens)(fieldBufferUpdated));
+                }
+            },
+            [context.buffer, context.methods.updateBuffer, lens],
+        );
+        
+        return { buffer, updateBuffer };
+    };
+
+export const usePrismFor = <S,>(FormContext: Ctx.FormContext<S>) =>
+    // Named function for DevTools
+    function usePrism<A,>(prism: Prism<S, A>): AccessorBufferProps<Optional<A>> {
+        const context = Ctx.useForm(FormContext);
+        
+        type FieldBuffer = Optional<A>;
+        const buffer = React.useMemo<FieldBuffer>(
+            () => O.preview(prism)(context.buffer),
+            [context.buffer, prism],
+        );
+        const updateBuffer = React.useCallback<(fieldBufferUpdated: Updater<FieldBuffer>) => void>(
+            (fieldBufferUpdated: Updater<FieldBuffer>) => {
+                return context.methods.updateBuffer((buffer: S) => {
+                    // Note: in case the prism returns `undefined`, for an object property, it would be nice to
+                    // remove the property from the buffer altogether, but currently optics-ts just sets it to
+                    // `undefined`. `O.remove()` also does not work, because that is only supported for array elements.
+                    if (typeof fieldBufferUpdated === 'function') {
+                        // Unsafe cast because the user may pass a function of an invalid type (we cannot check)
+                        const updater = fieldBufferUpdated as (fieldBuffer: FieldBuffer) => void;
+                        return O.modify(prism)(updater)(buffer);
+                    } else {
+                        return O.set(prism)(fieldBufferUpdated)(buffer);
+                    }
+                });
+            },
+            [context.buffer, context.methods.updateBuffer, prism],
+        );
+        
+        return { buffer, updateBuffer };
+    };
+
+export const useTraversalFor = <S,>(FormContext: Ctx.FormContext<S>) =>
+    // Named function for DevTools
+    function usePrism<A,>(prism: Prism<S, A>): AccessorBufferProps<Optional<A>> {
+        const context = Ctx.useForm(FormContext);
+        
+        type FieldBuffer = Optional<A>;
+        const buffer = React.useMemo<FieldBuffer>(
+            () => O.preview(prism)(context.buffer),
+            [context.buffer, prism],
+        );
+        const updateBuffer = React.useCallback<(fieldBufferUpdated: Updater<FieldBuffer>) => void>(
+            (fieldBufferUpdated: Updater<FieldBuffer>) => {
+                return context.methods.updateBuffer((buffer: S) => {
+                    // Note: in case the prism returns `undefined`, for an object property, it would be nice to
+                    // remove the property from the buffer altogether, but currently optics-ts just sets it to
+                    // `undefined`. `O.remove()` also does not work, because that is only supported for array elements.
+                    if (typeof fieldBufferUpdated === 'function') {
+                        // Unsafe cast because the user may pass a function of an invalid type (we cannot check)
+                        const updater = fieldBufferUpdated as (fieldBuffer: FieldBuffer) => void;
+                        return O.modify(prism)(updater)(buffer);
+                    } else {
+                        return O.set(prism)(fieldBufferUpdated)(buffer);
+                    }
+                });
+            },
+            [context.buffer, context.methods.updateBuffer, prism],
+        );
+        
+        return { buffer, updateBuffer };
+    };
+
+// Hook to get the result of an accessor in the current form context
+export const useAccessorFor = <S,>(FormContext: Ctx.FormContext<S>) =>
+    // Named function for DevTools
+    function useAccessor<A,>(accessor: Accessor<S, A>): AccessorBufferProps<OpticFocus<Optic<S, A>>> {
+        const context = Ctx.useForm(FormContext);
+        
+        const optic: Optic<S, A> = parseAccessor(accessor);
+        
+        type FieldBuffer = OpticFocus<Optic<S, A>>;
+        const buffer = React.useMemo<FieldBuffer>(
+            (): FieldBuffer => {
+                if (isLens(optic)) {
+                    return O.get(optic as O.Lens<S, O.OpticParams, A>)(context.buffer);
+                } else if (isPrism(optic)) {
+                    return O.preview(optic as O.Prism<S, O.OpticParams, A>)(context.buffer);
+                } else if (isTraversal(optic)) {
+                    return O.collect(optic as O.Traversal<S, O.OpticParams, A>)(context.buffer);
+                } else {
+                    throw new Error($msg`Invalid accessor ${optic}`);
+                }
+            },
+            [context.buffer, optic],
+        );
+        const updateBuffer = React.useCallback<(fieldBufferUpdated: Updater<FieldBuffer>) => void>(
+            (fieldBufferUpdated: Updater<FieldBuffer>) => {
+                return context.methods.updateBuffer(O.set(optic)(fieldBufferUpdated));
+            },
+            [context.buffer, context.methods.updateBuffer, accessor],
         );
         
         return { buffer, updateBuffer };

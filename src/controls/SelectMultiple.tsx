@@ -11,12 +11,12 @@ export type Option = {
     label: string,
 };
 
-type SelectBuffer = OptionKey;
+type SelectBuffer = Array<OptionKey>;
 
-type SelectControlProps = ComponentPropsWithRef<'select'> & ControlBufferProps<SelectBuffer> & {
+type SelectMultipleControlProps = ComponentPropsWithRef<'select'> & ControlBufferProps<SelectBuffer> & {
     options: Record<OptionKey, Option>,
 };
-export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlProps>((props, ref) => {
+export const SelectMultipleControl = React.forwardRef<HTMLSelectElement, SelectMultipleControlProps>((props, ref) => {
     const { buffer, updateBuffer, options, ...propsRest } = props;
     
     const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLSelectElement>) => {
@@ -41,6 +41,6 @@ export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlPr
         </select>
     );
 });
-SelectControl.displayName = 'SelectControl';
+SelectMultipleControl.displayName = 'SelectMultipleControl';
 
-export const connectSelect = ConnectAccessor<SelectBuffer, SelectControlProps>(SelectControl);
+export const connectSelectMultiple = ConnectAccessor<SelectBuffer, SelectMultipleControlProps>(SelectMultipleControl);
