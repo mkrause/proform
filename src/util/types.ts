@@ -17,7 +17,7 @@ export type GetWithPathList<S, P extends Array<unknown>> =
             : never;
 
 // Given a type `S`, and a dotted string path `P`, return the type indexed by `P`, or `never` if invalid path
-// Note: if the path as a whole matches a key (e.g. if `"x.y.z"` is a key), interprets the path as the single key.
+// Note: if the path as a whole matches a key (e.g. if `"x.y.z"` is a key), interprets the path as that single key.
 export type GetWithPathDotted<S, P> =
     P extends keyof S
         ? S[P]

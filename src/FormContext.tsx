@@ -2,9 +2,7 @@
 import type { Updater } from './util/types';
 import { generateRandomId } from './util/random.js';
 
-
 import * as O from 'optics-ts';
-
 import * as React from 'react';
 
 import type { Accessor } from './Accessor.js';
@@ -14,13 +12,13 @@ import type { Accessor } from './Accessor.js';
 Design notes:
   - We use a generic React context parameterized by the buffer type `A`.
     > TypeScript cannot automatically bind the type `A` based on the context provider, see:
-      - https://stackoverflow.com/a/52648865/233884
+      https://stackoverflow.com/a/52648865/233884
     > Thus, we need to wrap all values that depend on `A` in a function `<A>() => ...`.
       > We give the name a prefix `make` so that consumer code can use the plain name without `make` prefix, e.g.:
         `const Context = makeContext<A>();`
-      > For hooks we may use the `For` suffix instead because hooks need to start with `use`
-      > If the value is a function that doesn't have generics you can just add the generic `<A>`, without `makeX()`
-        > But then again if the function already has a generic you can't because you can't partially apply generics.
+      > For hooks we may use a suffix `For` instead because hooks conventionally start with `use`
+      > If the value is a function without its own generics you could just add the generic `<A>`, without `makeX()`
+        > But if the function already has some generics you can't, because you can't partially apply generics in TS.
 */
 
 

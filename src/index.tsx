@@ -91,20 +91,20 @@ export const test = () => {
             if (user.contact.postalCode.trim() === '') {
                 errors.set(_.path('contact.postalCode'), 'Postal code is required');
             } else if (!/^\s*[0-9]{4}\s*[a-zA-Z]{2}\s*$/.test(user.contact.postalCode)) {
-                errors.set(_.path('contact.postalCode'), 'Invalid postal code');
+                errors.set(_.path('contact.postalCode'), 'Please enter a valid postal code');
             }
             
             // https://stackoverflow.com/a/53297852/233884
             if (user.contact.phoneNumber.trim() === '') {
                 // Optional
             } else if (!/^\s*([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+\s*$/.test(user.contact.phoneNumber)) {
-                errors.set(_.path('contact.phoneNumber'), 'Invalid phone number');
+                errors.set(_.path('contact.phoneNumber'), 'Please enter a valid phone number');
             }
             
             if (user.email.trim() === '') {
                 errors.set(_.prop('email'), 'Email address is required');
             } else if (!/@/.test(user.email)) {
-                errors.set(_.prop('email'), 'Invalid email address');
+                errors.set(_.prop('email'), 'Please enter a valid email address');
             }
             
             return errors;
@@ -118,8 +118,8 @@ export const test = () => {
             <A, F>({ visible = true, ...props }: ValidationMessageProps<A, F> & { visible?: boolean }) =>
                 <Form.ValidationMessage {...props}>
                     {({ error }) =>
-                        <span className="validation-message">
-                            {error !== null && visible &&
+                        <span className={cx('validation-message', { 'validation-message--visible': visible })}>
+                            {error !== null && //visible &&
                                 error.message
                             }
                         </span>
@@ -131,24 +131,34 @@ export const test = () => {
         );
         
         type TextFieldProps<A> = FieldProps<A, string> & {
+            label: string,
             labelProps?: ComponentPropsWithoutRef<'label'>,
             controlProps?: Omit<React.ComponentPropsWithRef<typeof Form.Text>, 'accessor'>,
         };
         const TextField = React.useCallback(Object.assign(
-            <A,>({ labelProps = {}, controlProps = {}, ...props }: TextFieldProps<A>) =>
+            <A,>({ label, labelProps = {}, controlProps = {}, ...props }: TextFieldProps<A>) =>
                 <Form.Field<string> {...props}>
                     {({ accessor, touched, setTouched }) => {
                         const [focused, setFocused] = React.useState<boolean>(false);
+                        const { buffer } = Form.useAccessor(accessor);
                         const validationError = Form.useValidation(accessor);
+                        
+                        const hasInteracted = touched || focused;
+                        
+                        // Note: can also be neither of the two, if the user has not interacted with the field yet
+                        const isValid = hasInteracted && validationError === null;
+                        const isInvalid = hasInteracted && validationError !== null;
+                        
                         return (
                             <label {...labelProps}
                                 className={cx('field',
-                                    { 'field--valid': (touched || focused) && validationError === null },
-                                    { 'field--invalid': (touched || focused) && validationError !== null },
+                                    { 'field--valid': isValid },
+                                    { 'field--invalid': isInvalid },
                                     labelProps.className,
                                 )}
                             >
-                                <span className="input-text">
+                                <span className={cx('input-text', { 'input-text--empty': buffer === '' })}>
+                                    <span className="label">{label}</span>
                                     <Form.Text
                                         accessor={accessor}
                                         {...controlProps}
@@ -159,6 +169,7 @@ export const test = () => {
                                             setTouched(true);
                                             setFocused(false);
                                         }}
+                                        aria-invalid={isInvalid ? 'true' : 'false'}
                                     />
                                 </span>
                                 <ValidationMessage
@@ -237,15 +248,16 @@ export const test = () => {
                         
                         <TextField
                             accessor="name"
+                            label="Name"
                             controlProps={{
-                                placeholder: 'Name',
                             }}
                         />
                         
                         <TextField
                             accessor="email"
+                            label="Email address"
                             controlProps={{
-                                placeholder: 'Email address',
+                                placeholder: 'user@example.com',
                             }}
                         />
                         
@@ -267,22 +279,24 @@ export const test = () => {
                             
                             <TextField
                                 accessor="contact.address"
+                                label="Address"
                                 controlProps={{
-                                    placeholder: 'Address',
                                 }}
                             />
                             
                             <TextField
                                 accessor="contact.postalCode"
+                                label="Postal code"
                                 controlProps={{
-                                    placeholder: 'Postal code',
+                                    placeholder: '1234 AB',
                                 }}
                             />
                             
                             <TextField
                                 accessor="contact.phoneNumber"
+                                label="Phone number (optional)"
                                 controlProps={{
-                                    placeholder: 'Phone number (optional)',
+                                    //placeholder: '(000) 000 0000 00',
                                 }}
                             />
                         </fieldset>

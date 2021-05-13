@@ -41,7 +41,6 @@ export const connectField = <A,>(FormContext: Ctx.FormContext<A>) =>
             children = props.children;
         }
         
-        //console.log('field', context);
         return (
             <FormContext.Provider value={context}>
                 {children}
