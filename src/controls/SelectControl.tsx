@@ -11,7 +11,7 @@ export type Option = {
     label: string,
 };
 
-type SelectBuffer = OptionKey;
+export type SelectBuffer = OptionKey;
 
 type SelectControlProps = ComponentPropsWithRef<'select'> & ControlBufferProps<SelectBuffer> & {
     options: Record<OptionKey, Option>,

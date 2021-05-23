@@ -3,26 +3,27 @@ import * as O from 'optics-ts';
 
 import * as React from 'react';
 
-import * as Ctx from '../FormContext.js';
-import { Accessor, AccessorProp, parseAccessor } from '../Accessor.js';
+import { ValidationError } from '../context/Validation.js';
+import * as Ctx from '../context/FormContext.js';
+import { Optic, isLens, Accessor, parseAccessor } from '../Accessor.js';
 
 
 // Hook to get the result of an accessor in the current form context
 export const useValidationFor = <A,>(FormContext: Ctx.FormContext<A>) =>
     // Named function for DevTools
-    function useValidation<F,>(accessorProp: AccessorProp<A, F>): null | Ctx.ValidationError {
+    function useValidation<F,>(accessorProp: Accessor<A, F>): null | ValidationError {
         const { validation } = Ctx.useForm(FormContext);
         
-        const accessor = React.useMemo<Accessor<Ctx.Validation<A>, F>>(
+        const accessor = React.useMemo<Optic<Ctx.Validation<A>, F>>(
             () => parseAccessor(accessorProp),
             [accessorProp],
         );
         
-        let validationError: null | Ctx.ValidationError = null;
-        if (validation !== null) {
+        let validationError: null | ValidationError = null;
+        if (validation !== null && isLens(accessor)) {
             const result = O.get(accessor)(validation);
             
-            if (result instanceof Error) {
+            if (result instanceof ValidationError) {
                 validationError = result;
             }
         }
@@ -30,8 +31,8 @@ export const useValidationFor = <A,>(FormContext: Ctx.FormContext<A>) =>
     };
 
 export type ValidationMessageProps<A, F> = {
-    accessor: AccessorProp<A, F>,
-    children?: React.ReactNode | (({ error }: { error: null | Ctx.ValidationError }) => React.ReactNode),
+    accessor: Accessor<A, F>,
+    children?: React.ReactNode | (({ error }: { error: null | ValidationError }) => React.ReactNode),
 };
 export const connectValidationMessage = <A,>(FormContext: Ctx.FormContext<A>) =>
     function ValidationMessage<F>(props: ValidationMessageProps<A, F>): null | JSX.Element {

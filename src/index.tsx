@@ -124,15 +124,13 @@ export const test = () => {
                     {({ error }) =>
                         <span className={cx('validation-message', { 'validation-message--visible': visible })}>
                             {error !== null && visible &&
-                                error.element
+                                error.render()
                             }
                         </span>
                     }
                 </Form.ValidationMessage>,
-                { displayName: 'ValidationMessage' },
-            ),
-            [],
-        );
+            { displayName: 'ValidationMessage' },
+        ), []);
         
         type TextFieldProps<A> = FieldProps<A, string> & {
             label: string,
@@ -184,10 +182,8 @@ export const test = () => {
                         );
                     }}
                 </Form.Field>,
-                { displayName: 'TextField' },
-            ),
-            [],
-        );
+            { displayName: 'TextField' },
+        ), []);
         
         return (
             <Form.FormProvider
@@ -286,6 +282,15 @@ export const test = () => {
                         
                         <fieldset>
                             <legend>Contact information</legend>
+                            
+                            <Form.SelectField
+                                accessor="contact.legalEntityType"
+                                label="Type"
+                                options={{
+                                    private: { label: 'Private' },
+                                    business: { label: 'Business' },
+                                }}
+                            />
                             
                             <label className="field field--valid">
                                 <Form.Select

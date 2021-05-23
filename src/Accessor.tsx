@@ -7,7 +7,7 @@ import * as O from 'optics-ts';
 
 import * as React from 'react';
 
-import * as Ctx from './FormContext.js';
+import * as Ctx from './context/FormContext.js';
 import type { ControlBufferProps } from './components/Control.js';
 
 
@@ -25,23 +25,23 @@ Design notes:
       - `Traversal<S, A>`, which focuses on zero or more `A` elements (focus type `Array<A>`)
 */
 
-type Lens<S, A> = O.Lens<S, O.OpticParams, A>;
-type Prism<S, A> = O.Prism<S, O.OpticParams, A>;
-type Traversal<S, A> = O.Traversal<S, O.OpticParams, A>;
+export type Lens<S, A> = O.Lens<S, O.OpticParams, A>;
+export type Prism<S, A> = O.Prism<S, O.OpticParams, A>;
+export type Traversal<S, A> = O.Traversal<S, O.OpticParams, A>;
 
-type Optic<S, A> = Lens<S, A> | Prism<S, A> | Traversal<S, A>;
-const Optic = O.optic().constructor;
+export type Optic<S, A> = Lens<S, A> | Prism<S, A> | Traversal<S, A>;
+export const Optic = O.optic().constructor;
 
-const isLens = (input: unknown): input is O.Lens<unknown, O.OpticParams, unknown> => {
+export const isLens = (input: unknown): input is O.Lens<unknown, O.OpticParams, unknown> => {
     return input instanceof Optic && (input as any)._tag === 'Lens';
 };
-const isPrism = (input: unknown): input is O.Prism<unknown, O.OpticParams, unknown> => {
+export const isPrism = (input: unknown): input is O.Prism<unknown, O.OpticParams, unknown> => {
     return input instanceof Optic && (input as any)._tag === 'Prism';
 };
-const isTraversal = (input: unknown): input is O.Traversal<unknown, O.OpticParams, unknown> => {
+export const isTraversal = (input: unknown): input is O.Traversal<unknown, O.OpticParams, unknown> => {
     return input instanceof Optic && (input as any)._tag === 'Traversal';
 };
-const isOptic = (input: unknown): input is Optic<unknown, unknown> => {
+export const isOptic = (input: unknown): input is Optic<unknown, unknown> => {
     return isLens(input) || isPrism(input) || isTraversal(input);
 };
 
@@ -213,13 +213,17 @@ export const useAccessorFor = <S,>(FormContext: Ctx.FormContext<S>) =>
         return { buffer, updateBuffer };
     };
 
+export type ConnectedControlBufferProps<A, F> = {
+    accessor: Accessor<A, F>,
+};
+
 export const ConnectAccessor = <F, P extends ControlBufferProps<F>>(Component: React.ComponentType<P>) =>
     <A,>(FormContext: Ctx.FormContext<A>) => {
         type ElementRefT = React.ElementRef<typeof Component>;
         type RefT = React.PropsWithRef<P> extends { ref?: infer R } ? R : never;
-        type PropsT = Omit<React.PropsWithoutRef<P>, keyof ControlBufferProps<F>> & {
-            accessor: AccessorProp<A, F>,
-        };
+        
+        // Omit the direct buffer props and replace with `Accessor`-based props
+        type PropsT = Omit<React.PropsWithoutRef<P>, keyof ControlBufferProps<F>> & ConnectedControlBufferProps<A, F>;
         
         const forwarder: React.ForwardRefRenderFunction<ElementRefT, PropsT> = ({ accessor, ...props }, ref) => {
             const useAccessor = React.useMemo(() => useAccessorFor(FormContext), []);
