@@ -102,9 +102,13 @@ export const test = () => {
             }
             
             if (user.email.trim() === '') {
-                errors.set(_.prop('email'), 'Email address is required');
+                errors.set(_.prop('email'), <>Email address is required</>);
             } else if (!/@/.test(user.email)) {
-                errors.set(_.prop('email'), 'Please enter a valid email address');
+                // Multiline error message for testing purposes
+                errors.set(_.prop('email'), <>
+                    Please enter a valid email address.<br/>
+                    A valid email address should include at least an "@"-sign.
+                </>);
             }
             
             return errors;
@@ -119,8 +123,8 @@ export const test = () => {
                 <Form.ValidationMessage {...props}>
                     {({ error }) =>
                         <span className={cx('validation-message', { 'validation-message--visible': visible })}>
-                            {error !== null && //visible &&
-                                error.message
+                            {error !== null && visible &&
+                                error.element
                             }
                         </span>
                     }
@@ -194,6 +198,8 @@ export const test = () => {
                 onSubmit={handleSubmit}
             >
                 <Form.Form>
+                    <h1>Survey</h1>
+                    
                     <div className="form">
                         {/*
                         <Form.Field accessor={O.optic<User>().prop('name')}>
@@ -246,6 +252,23 @@ export const test = () => {
                         />
                         */}
                         
+                        <div className="radio-group">
+                            <span className="radio-group__label">Gender</span>
+                            
+                            <label>
+                                <input type="radio" name="gender" value="male" defaultChecked/>
+                                Male
+                            </label>
+                            <label>
+                                <input type="radio" name="gender" value="female"/>
+                                Female
+                            </label>
+                            <label>
+                                <input type="radio" name="gender" value="other"/>
+                                I'd rather not say
+                            </label>
+                        </div>
+                        
                         <TextField
                             accessor="name"
                             label="Name"
@@ -257,14 +280,14 @@ export const test = () => {
                             accessor="email"
                             label="Email address"
                             controlProps={{
-                                placeholder: 'user@example.com',
+                                placeholder: 'you@example.com',
                             }}
                         />
                         
                         <fieldset>
                             <legend>Contact information</legend>
                             
-                            <label className="field">
+                            <label className="field field--valid">
                                 <Form.Select
                                     accessor="contact.legalEntityType"
                                     options={{
@@ -296,24 +319,37 @@ export const test = () => {
                                 accessor="contact.phoneNumber"
                                 label="Phone number (optional)"
                                 controlProps={{
-                                    //placeholder: '(000) 000 0000 00',
+                                    placeholder: '(000) 000-0000',
                                 }}
                             />
                         </fieldset>
                         
-                        <Form.Select
-                            accessor="interests"
-                            options={{
-                                'music': { label: 'Music' },
-                                'culture': { label: 'Culture' },
-                                'politics': { label: 'Politics' },
-                                'science': { label: 'Science' },
-                                'tech': { label: 'Tech' },
-                            }}
-                        />
-                        <ValidationMessage
-                            accessor="interests"
-                        />
+                        <label className="field field--valid">
+                            <Form.Select
+                                accessor="interests"
+                                options={{
+                                    'music': { label: 'Music' },
+                                    'culture': { label: 'Culture' },
+                                    'politics': { label: 'Politics' },
+                                    'science': { label: 'Science' },
+                                    'tech': { label: 'Tech' },
+                                }}
+                            />
+                            <ValidationMessage
+                                accessor="interests"
+                            />
+                        </label>
+                        
+                        <label>
+                            Additional remarks
+                            
+                            <textarea rows={4}/>
+                        </label>
+                        
+                        <label className="field field--checkbox">
+                            <input type="checkbox"/>
+                            I agree to the terms and conditions
+                        </label>
                         
                         <button type="submit">Submit</button>
                     </div>

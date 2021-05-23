@@ -72,7 +72,9 @@ const validationFromErrors = <A,>(buffer: A, errors: ValidationErrors<A>): null 
     let validation = buffer as Validation<A>;
     errors.forEach((error, accessor) => {
         try {
-            validation = O.set<Validation<A>, any, any>(accessor)(new Error(error))(validation);
+            // XXX we want to support `error` as JSX element as well, need to handle this properly
+            const validationError: Error = Object.assign(new Error(error), { element: error });
+            validation = O.set<Validation<A>, any, any>(accessor)(validationError)(validation);
         } catch (e) {
             console.error(`Invalid accessor found`);
             // Ignore

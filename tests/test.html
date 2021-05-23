@@ -1,9 +1,9 @@
-<!DOCTYPE html>
 <!--
     $ npm run build:esm
     $ npx http-server --port=8080
     $ open http://127.0.0.1:8080/tests/test.html
 -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -15,6 +15,20 @@
     <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura-dark.css" type="text/css">
     
     <style>
+        input[type]:focus-visible, select:focus-visible, textarea {
+            border-color: #4a4a4a !important; /* Override Sakura */
+        }
+        :focus-visible {
+            /*outline: 1px solid lightblue !important;*/
+            outline: none !important; /* Override Sakura */
+            box-shadow: 0 0 0 3px rgb(93 195 255 / 60%) !important; /* Override Sakura */
+        }
+        :is(input[type=radio], input[type=checkbox]):focus-visible {
+            box-shadow: none !important;
+            /* Use a drop shadow for radio/checkbox inputs rather than a box-shadow, so that it matches the shape */
+            filter: drop-shadow(0 0 3px rgb(93 195 255 / 100%));
+        }
+        
         body {
             max-width: unset;
             
@@ -39,9 +53,9 @@
             line-break: anywhere;
         }
         
-        form, .form {
-            max-width: 100rem;
-            margin-left: 30rem;
+        form {
+            max-width: 70rem;
+            margin-left: 60rem;
             padding: 2rem 0;
             
             display: flex;
@@ -53,13 +67,17 @@
             display: none !important;
         }
         
+        fieldset {
+            border-radius: 0.5rem;
+        }
+        
         .validation-message {
-            --line-height: 1.6em;
+            --line-height: 1.6;
             
             margin: 0.2em 0.4em;
             
             /* FIXME: https://css-tricks.com/how-to-tame-line-height-in-css/ */
-            min-height: calc(var(--line-height) + 1px); /* Hack correction for line-height/height discrepancy */
+            min-height: calc(var(--line-height) * 1em); /* Hack correction for line-height/height discrepancy */
             
             line-height: var(--line-height);
             font-size: 1.2rem;
@@ -75,38 +93,46 @@
             pointer-events: none;
             display: block;
             opacity: 0;
-            height: var(--line-height);
-            transform: translate(0, calc(-0.1 * var(--line-height)));
+            height: calc(var(--line-height) * 1em);
+            transform: translate(0, calc(-0.1 * var(--line-height) * 1em));
         }
         
         input[type], select {
             margin: 0 !important;
-            padding: 0.8rem 1.4rem;
-            padding-top: 1.6rem;
+            padding: 1.2rem 1.4rem;
             
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-weight: 400;
             font-size: 0.9em;
         }
         
+        label {
+            margin: 0; /* Override Sakura */
+        }
+        
         label.field {
             display: flex;
             flex-direction: column;
+            margin: 0;
+            margin-top: 1rem;
         }
         
         /* Floating label */
         label.field > .input-text > .label {
             pointer-events: none;
+            user-select: none;
             align-self: center;
             
             position: absolute;
             left: 1.4rem; /* Should match input `padding-left` */
+            white-space: nowrap;
             
             opacity: 0.4;
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-weight: 400;
             font-size: 0.9em;
             
+            transform-origin: left center;
             transition-property: transform, opacity, font-size;
             transition-duration: 100ms;
             transition-timing-function: ease-in;
@@ -115,14 +141,18 @@
         label.field > .input-text:focus-within > .label,
         label.field > .input-text:not(.input-text--empty) > .label {
             opacity: 0.6;
-            font-size: 0.6em;
-            transform: translate(0, -1em);
+            /* font-size: 0.6em; */
+            transform: translate(0, -50%) scale(0.66);
         }
         label.field > .input-text > input[type]::placeholder {
-            transition: color 100ms ease-in 100ms;
+            transition: opacity 100ms ease-in 100ms;
         }
         label.field > .input-text.input-text--empty:not(:focus-within) > input[type]::placeholder {
-            color: transparent;
+            opacity: 0;
+        }
+        label.field > .input-text > input[type] {
+            padding: 0.8rem 1.4rem;
+            padding-top: 1.6rem;
         }
         
         label.field > .input-text {
@@ -152,12 +182,54 @@
             opacity: 0;
             transition: opacity 100ms ease-in 100ms;
         }
+        
         label.field--valid > .input-text::after { content: '✓'; color: #4caf50; }
         label.field--invalid > .input-text::after { content: '✕'; color: indianred; }
         label:focus-within > .input-text::after { opacity: 0.6; }
+        @media speech {
+            label > .input-text::after { content: none; }
+        }
         
-        label.field--valid > .input-text input:not(:focus) { border-color: #4caf50; }
-        label.field--invalid > .input-text input:not(:focus) { border-color: indianred; }
+        label.field--valid :is(.input-text input, select):not(:focus-visible) { border-color: #4caf50; }
+        label.field--invalid :is(.input-text input, select):not(:focus-visible) { border-color: indianred; }
+        
+        
+        /* Form controls */
+        
+        textarea {
+            resize: vertical;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5ch;
+            
+            font-weight: 300;
+        }
+        .radio-group > .radio-group__label {
+            position: absolute;
+            transform-origin: left center;
+            transform: translate(0, -1em) scale(calc(2/3));
+        }
+        .radio-group > label {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.8ch;
+            
+            font-weight: normal;
+        }
+        
+        .field.field--checkbox {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.8ch;
+            
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>

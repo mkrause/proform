@@ -8,11 +8,11 @@ import { ConnectAccessor } from '../Accessor.js';
 
 type TextBuffer = string;
 
-type TextControlProps = ComponentPropsWithRef<'input'> & ControlBufferProps<TextBuffer>;
-export const TextControl = React.forwardRef<HTMLInputElement, TextControlProps>((props, ref) => {
+type TextAreaControlProps = ComponentPropsWithRef<'textarea'> & ControlBufferProps<TextBuffer>;
+export const TextAreaControl = React.forwardRef<HTMLTextAreaElement, TextAreaControlProps>((props, ref) => {
     const { buffer, updateBuffer, ...propsRest } = props;
     
-    const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
         updateBuffer(evt.target.value);
         
         // Call user-defined `onChange`, if any
@@ -20,8 +20,8 @@ export const TextControl = React.forwardRef<HTMLInputElement, TextControlProps>(
     }, [updateBuffer, propsRest.onChange]);
     
     return (
-        <input
-            type="text"
+        <textarea
+            ref={ref}
             value={buffer}
             {...propsRest}
             className={cx(propsRest.className)}
@@ -29,6 +29,6 @@ export const TextControl = React.forwardRef<HTMLInputElement, TextControlProps>(
         />
     );
 });
-TextControl.displayName = 'TextControl';
+TextAreaControl.displayName = 'TextAreaControl';
 
-export const connectText = ConnectAccessor<TextBuffer, TextControlProps>(TextControl);
+export const connectText = ConnectAccessor<TextBuffer, TextAreaControlProps>(TextAreaControl);

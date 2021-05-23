@@ -6,7 +6,7 @@ import type { ControlBufferProps } from '../components/Control.js';
 import { ConnectAccessor } from '../Accessor.js';
 
 
-export type OptionKey = string | number; // TODO: symbol?
+export type OptionKey = string; // TODO: `number | symbol`?
 export type Option = {
     label: string,
 };
@@ -21,7 +21,7 @@ export const SelectMultipleControl = React.forwardRef<HTMLSelectElement, SelectM
     
     const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLSelectElement>) => {
         const optionKey: OptionKey = evt.target.value;
-        updateBuffer(optionKey);
+        updateBuffer(optionKey); // FIXME: needs to update array
         
         // Call user-defined `onChange`, if any
         if (typeof propsRest.onChange === 'function') { propsRest.onChange(evt); }
@@ -30,6 +30,7 @@ export const SelectMultipleControl = React.forwardRef<HTMLSelectElement, SelectM
     return (
         <select
             ref={ref}
+            multiple
             value={buffer}
             {...propsRest}
             className={cx(propsRest.className)}
