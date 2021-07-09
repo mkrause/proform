@@ -1,20 +1,20 @@
 
 import * as O from 'optics-ts';
 
-import { classNames as cx, ComponentPropsWithoutRef } from './util/components.js';
-import type { ClassNameArgument } from './util/components.js';
+import { classNames as cx, ComponentPropsWithoutRef } from './util/components'; // .js
+import type { ClassNameArgument } from './util/components'; // .js
 import * as React from 'react';
 
-import * as Ctx from './context/FormContext.js';
-import { useAccessorFor } from './Accessor.js';
-import type { ControlBufferProps } from './components/Control.js';
+import * as Ctx from './context/FormContext'; // .js
+import { useAccessorFor } from './Accessor'; // .js
+import type { ControlBufferProps } from './components/Control'; // .js
 
-import { connectText } from './controls/TextControl.js';
-import { connectSelect } from './controls/SelectControl.js';
-import { connectSelectField } from './fields/SelectField.js';
-import { connectField } from './components/Field.js';
-import { connectForm, connectFormNested } from './components/Form.js';
-import { useValidationFor, connectValidationMessage } from './components/ValidationMessage.js';
+import { connectText } from './controls/TextControl'; // .js
+import { connectSelect } from './controls/SelectControl'; // .js
+import { connectSelectField } from './fields/SelectField'; // .js
+import { connectField } from './components/Field'; // .js
+import { connectForm, connectFormNested } from './components/Form'; // .js
+import { useValidationFor, connectValidationMessage } from './components/ValidationMessage'; // .js
 
 
 export const makeForm = <A,>() => {

@@ -1,13 +1,13 @@
 
 import * as React from 'react';
 
-import { classNames as cx, ComponentPropsWithoutRef } from './util/components.js';
+import { classNames as cx, ComponentPropsWithoutRef } from './util/components'; // .js
 
-//import * as Ctx from './FormContext.js';
-import * as Proform from './proform.js';
+//import * as Ctx from './FormContext'; // .js
+import * as Proform from './proform'; // .js
 
-import type { FieldProps } from './components/Field.js';
-import type { ValidationMessageProps } from './components/ValidationMessage.js';
+import type { FieldProps } from './components/Field'; // .js
+import type { ValidationMessageProps } from './components/ValidationMessage'; // .js
 
 
 

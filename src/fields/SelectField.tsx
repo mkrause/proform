@@ -1,12 +1,12 @@
 
-import { classNames as cx, ComponentPropsWithRef } from '../util/components.js';
+import { classNames as cx, ComponentPropsWithRef } from '../util/components'; // .js
 import * as React from 'react';
 
-import * as Ctx from '../context/FormContext.js';
-import type { ConnectedControlBufferProps } from '../Accessor.js';
-import type { ControlBufferProps } from '../components/Control.js';
+import * as Ctx from '../context/FormContext'; // .js
+import type { ConnectedControlBufferProps } from '../Accessor'; // .js
+import type { ControlBufferProps } from '../components/Control'; // .js
 
-import type { OptionKey, Option, SelectBuffer } from '../controls/SelectControl.js';
+import type { OptionKey, Option, SelectBuffer } from '../controls/SelectControl'; // .js
 
 
 //type ControlComponent<B, P = {}> = React.ComponentType<ControlBufferProps<B> & P>;

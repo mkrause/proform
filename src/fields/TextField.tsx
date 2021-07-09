@@ -1,9 +1,9 @@
 /*
-import { classNames as cx, ComponentPropsWithoutRef } from '../util/components.js';
+import { classNames as cx, ComponentPropsWithoutRef } from '../util/components'; // .js
 import * as React from 'react';
 
-import type { ControlBufferProps } from '../components/Control.js';
-import { ConnectAccessor } from '../Accessor.js';
+import type { ControlBufferProps } from '../components/Control'; // .js
+import { ConnectAccessor } from '../Accessor'; // .js
 
 
 type TextFieldProps<A> = FieldProps<A, string> & {

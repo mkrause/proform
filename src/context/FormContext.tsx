@@ -1,16 +1,16 @@
 
 import $msg from 'message-tag';
 import type { Updater } from '../util/types';
-import { generateRandomId } from '../util/random.js';
+import { generateRandomId } from '../util/random'; // .js
 
 import * as O from 'optics-ts';
 
 import { isElement } from 'react-is';
 import * as React from 'react';
 
-import type { Optic } from '../Accessor.js';
+import type { Optic } from '../Accessor'; // .js
 import { Overlay } from './util';
-import { ValidationError } from './Validation.js';
+import { ValidationError } from './Validation'; // .js
 
 
 /*

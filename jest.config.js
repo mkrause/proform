@@ -6,12 +6,15 @@ module.exports = {
   
   testTimeout: 30_000,
   
-  //testEnvironment: 'jsdom', // Use JSDOM to fake a browser environment
+  testEnvironment: 'jsdom', // Use JSDOM to fake a browser environment
   
   //transform: ..., // Note: babel transform is set up automatically
   
   setupFiles: [path.join(__dirname, 'tests/setup_global.js')],
   setupFilesAfterEnv: [path.join(__dirname, 'tests/setup_test.js')],
+  
+  // https://github.com/kulshekhar/ts-jest/issues/1057
+  //resolver: 'jest-ts-webcompat-resolver',
   
   /*
   // Webpack module loading stubs
