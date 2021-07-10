@@ -1,4 +1,5 @@
 
+const isTest = process.env.NODE_ENV === 'test';
 const env = process.env.BABEL_ENV || 'esm';
 
 module.exports = {
@@ -33,6 +34,10 @@ module.exports = {
         }],
     ],
     plugins: [
+        // Note: jest does not handle imports with extensions. But for native ESM environments we do need the .js ext.
+        ...(isTest ? [] : [
+            ['babel-plugin-add-import-extension', { extension: 'js', replace: true }],
+        ]),
         ['transform-builtin-extend', {
             // See: http://stackoverflow.com/questions/33870684/why-doesnt-instanceof-work
             globals: ['Error'],

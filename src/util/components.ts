@@ -12,13 +12,37 @@ export const classNames = (...args: Array<ClassNameArgument>) => {
 };
 
 
+// Custom version of `Omit` that doesn't use `Pick`, to prevent verbose compiler messages/output. See:
+// https://github.com/microsoft/TypeScript/issues/34793
+// https://github.com/microsoft/TypeScript/pull/42524
+type OmitProps<T, K extends PropertyKey> = {
+    [P in keyof T as Exclude<P, K>]: T[P]
+};
+
+type PropsWithoutRef<P> =
+    'ref' extends keyof P ? OmitProps<P, 'ref'> : P;
+
+type PropsWithRef<P> =
+    'ref' extends keyof P
+        ? P extends { ref?: infer R | undefined }
+            ? string extends R
+                ? PropsWithoutRef<P> & { ref?: Exclude<R, string> | undefined }
+                : P
+            : P
+        : P;
+
+type ComponentPropsWithRefOverride<T extends React.ElementType> =
+    T extends React.ComponentClass<infer P>
+        ? PropsWithoutRef<P> & React.RefAttributes<InstanceType<T>>
+        : PropsWithRef<React.ComponentProps<T>>;
+
 // Version of `React.ComponentPropsWithX` that supports `classnames`-based `className` props
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/84d000f858caf/types/react/index.d.ts#L836
 export type ComponentPropsWithRef<T extends React.ElementType> =
-    Omit<React.ComponentPropsWithRef<T>, 'className'> & {
+    OmitProps<ComponentPropsWithRefOverride<T>, 'className'> & {
         className?: ClassNameArgument,
     };
 export type ComponentPropsWithoutRef<T extends React.ElementType> =
-    Omit<React.ComponentPropsWithoutRef<T>, 'className'> & {
+    OmitProps<PropsWithoutRef<React.ComponentProps<T>>, 'className'> & {
         className?: ClassNameArgument,
     };
