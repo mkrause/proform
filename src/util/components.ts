@@ -3,6 +3,9 @@
 import classNamesDeduped from 'classnames/dedupe';
 import type { Argument as ClassNameArgument } from 'classnames';
 
+import type * as React from 'react';
+import { forwardRef as reactForwardRef } from 'react';
+
 
 export type { ClassNameArgument };
 
@@ -15,8 +18,8 @@ export const classNames = (...args: Array<ClassNameArgument>) => {
 // Custom version of `Omit` that doesn't use `Pick`, to prevent verbose compiler messages/output. See:
 // https://github.com/microsoft/TypeScript/issues/34793
 // https://github.com/microsoft/TypeScript/pull/42524
-type OmitProps<T, K extends PropertyKey> = {
-    [P in keyof T as Exclude<P, K>]: T[P]
+type OmitProps<T, K> = {
+    [key in (keyof T extends infer U ? U extends K ? never : U extends keyof T ? U : never : never)]: T[key]
 };
 
 type PropsWithoutRef<P> =
@@ -46,3 +49,8 @@ export type ComponentPropsWithoutRef<T extends React.ElementType> =
     OmitProps<PropsWithoutRef<React.ComponentProps<T>>, 'className'> & {
         className?: ClassNameArgument,
     };
+
+export const forwardRef = reactForwardRef as
+    <T, P = {}>(
+        render: React.ForwardRefRenderFunction<T, P>
+    ) => React.ForwardRefExoticComponent<PropsWithoutRef<P> & React.RefAttributes<T>>;
