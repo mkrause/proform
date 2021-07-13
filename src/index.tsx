@@ -49,6 +49,7 @@ export const test = () => {
     type LegalEntityType = 'private' | 'business';
     type UserInterest = 'music' | 'culture' | 'politics' | 'science' | 'tech';
     type User = {
+        gender: 'male' | 'female' | 'other',
         //role: UserRole,
         name: string,
         email: string,
@@ -59,11 +60,14 @@ export const test = () => {
             phoneNumber: string,
         },
         interests: Array<UserInterest>,
+        remarks: string,
+        termsAndConditions: boolean,
     };
     
     //const Form = Proform.makeForm<User>();
     const TestApp = () => {
         const [buffer, setBuffer] = React.useState<User>({
+            gender: 'male',
             //role: 'user',
             name: '',
             email: '',
@@ -74,6 +78,8 @@ export const test = () => {
                 phoneNumber: '',
             },
             interests: [],
+            remarks: '',
+            termsAndConditions: false,
         });
         
         const Form = Proform.useFormProvider<User>();
@@ -250,19 +256,22 @@ export const test = () => {
                         
                         <div className="radio-group">
                             <span className="radio-group__label">Gender</span>
-                            
-                            <label>
-                                <input type="radio" name="gender" value="male" defaultChecked/>
-                                Male
-                            </label>
-                            <label>
-                                <input type="radio" name="gender" value="female"/>
-                                Female
-                            </label>
-                            <label>
-                                <input type="radio" name="gender" value="other"/>
-                                I'd rather not say
-                            </label>
+                            <Form.Radio accessor="gender" id="gender"
+                                options={{ male: {}, female: {}, other: {} }}
+                            >
+                                <label>
+                                    <Form.Radio.RadioButton option="male"/>
+                                    Male
+                                </label>
+                                <label>
+                                    <Form.Radio.RadioButton option="female"/>
+                                    Female
+                                </label>
+                                <label>
+                                    <Form.Radio.RadioButton option="other"/>
+                                    Other / I'd rather not say
+                                </label>
+                            </Form.Radio>
                         </div>
                         
                         <TextField
@@ -348,11 +357,11 @@ export const test = () => {
                         <label>
                             Additional remarks
                             
-                            <textarea rows={4}/>
+                            <Form.TextArea accessor="remarks" rows={4}/>
                         </label>
                         
                         <label className="field field--checkbox">
-                            <input type="checkbox"/>
+                            <Form.Checkbox accessor="termsAndConditions"/>
                             I agree to the terms and conditions
                         </label>
                         

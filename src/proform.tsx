@@ -10,6 +10,9 @@ import { useAccessorFor } from './Accessor'; // .js
 import type { ControlBufferProps } from './components/Control'; // .js
 
 import { connectText } from './controls/TextControl'; // .js
+import { connectTextArea } from './controls/TextAreaControl'; // .js
+import { connectCheckbox } from './controls/CheckboxControl'; // .js
+import { connectRadio, RadioControl } from './controls/RadioControl'; // .js
 import { connectSelect } from './controls/SelectControl'; // .js
 import { connectSelectField } from './fields/SelectField'; // .js
 import { connectField } from './components/Field'; // .js
@@ -67,6 +70,9 @@ export const makeForm = <A,>() => {
         
         // Control components
         Text: connectText(FormContext),
+        TextArea: connectTextArea(FormContext),
+        Checkbox: connectCheckbox(FormContext),
+        Radio: Object.assign(connectRadio(FormContext), { RadioButton: RadioControl.RadioButton }),
         Select: connectSelect(FormContext),
         SelectField: connectSelectField(FormContext)(connectSelect(FormContext)),
         
