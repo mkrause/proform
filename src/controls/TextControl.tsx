@@ -1,15 +1,15 @@
 
-import { classNames as cx, ComponentPropsWithRef, forwardRef } from '../util/components'; // .js
+import { classNames as cx, ComponentPropsWithRef } from '../util/components'; // .js
 import * as React from 'react';
 
 import type { ControlBufferProps } from '../components/Control'; // .js
 import { ConnectAccessor } from '../Accessor'; // .js
 
 
-type TextBuffer = string;
+export type TextBuffer = string;
 
 type TextControlProps = ComponentPropsWithRef<'input'> & ControlBufferProps<TextBuffer>;
-export const TextControl = forwardRef<HTMLInputElement, TextControlProps>((props, ref) => {
+export const TextControl = React.forwardRef<HTMLInputElement, TextControlProps>((props, ref) => {
     const { buffer, updateBuffer, ...propsRest } = props;
     
     const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {

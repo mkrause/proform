@@ -4,61 +4,61 @@ import * as TL from '@testing-library/react';
 import fireUserEvent from '@testing-library/user-event';
 
 import type { TextBuffer } from './TextControl';
-import { TextControl } from './TextControl';
+import { TextAreaControl } from './TextAreaControl';
 
 
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-describe('TextControl', () => {
-    // Controlled variant of `TextControl`
-    type TextControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof TextControl>, 'buffer' | 'updateBuffer'> & {
+describe('TextAreaControl', () => {
+    // Controlled variant of `TextAreaControl`
+    type TextAreaControlControlledProps =
+        Omit<React.ComponentPropsWithRef<typeof TextAreaControl>, 'buffer' | 'updateBuffer'> & {
             initialBuffer?: TextBuffer,
         };
-    const TextControlControlled = ({ initialBuffer = '', ...props }: TextControlControlledProps) => {
+    const TextAreaControlControlled = ({ initialBuffer = '', ...props }: TextAreaControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(initialBuffer);
-        return <TextControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
+        return <TextAreaControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
     const setup = (
-        props: PartialBy<React.ComponentPropsWithRef<typeof TextControl>, 'buffer' | 'updateBuffer'> = {},
+        props: PartialBy<React.ComponentPropsWithRef<typeof TextAreaControl>, 'buffer' | 'updateBuffer'> = {},
     ) => {
         const utils = TL.render(
-            <TextControl data-label="text-control" buffer="test" updateBuffer={() => {}} {...props}/>
+            <TextAreaControl data-label="text-area-control" buffer="test" updateBuffer={() => {}} {...props}/>
         );
         
         return {
             ...utils,
-            element: utils.getByTestId('text-control'),
+            element: utils.getByTestId('text-area-control'),
         };
     };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof TextControlControlled> = {}) => {
+    const setupControlled = (props: React.ComponentPropsWithRef<typeof TextAreaControlControlled> = {}) => {
         const utils = TL.render(
-            <TextControlControlled data-label="text-control" {...props}/>
+            <TextAreaControlControlled data-label="text-area-control" {...props}/>
         );
         
         return {
             ...utils,
-            element: utils.getByTestId('text-control'),
+            element: utils.getByTestId('text-area-control'),
         };
     };
+    
     beforeEach(TL.cleanup);
     
     test('should render a text control', () => {
         const { element } = setup();
         
-        expect(element).toBeInstanceOf(HTMLInputElement);
+        expect(element).toBeInstanceOf(HTMLTextAreaElement);
         expect(element).toHaveClass('', { exact: true });
         expect(element).toHaveValue('test');
-        expect(element).toHaveAttribute('type', 'text');
     });
     
     test('should accept `ref`', () => {
-        const ref = React.createRef<HTMLInputElement>();
+        const ref = React.createRef<HTMLTextAreaElement>();
         const { element } = setup({ ref });
         
-        expect(ref.current).toBeInstanceOf(HTMLInputElement);
+        expect(ref.current).toBeInstanceOf(HTMLTextAreaElement);
         expect(ref.current).toBe(element);
     });
     

@@ -6,29 +6,30 @@ import type { ControlBufferProps } from '../components/Control'; // .js
 import { ConnectAccessor } from '../Accessor'; // .js
 
 
-export type TextBuffer = string;
+export type CheckboxBuffer = boolean;
 
-type TextAreaControlProps = ComponentPropsWithRef<'textarea'> & ControlBufferProps<TextBuffer>;
-export const TextAreaControl = React.forwardRef<HTMLTextAreaElement, TextAreaControlProps>((props, ref) => {
+type CheckboxControlProps = ComponentPropsWithRef<'input'> & ControlBufferProps<CheckboxBuffer>;
+export const CheckboxControl = React.forwardRef<HTMLInputElement, CheckboxControlProps>((props, ref) => {
     const { buffer, updateBuffer, ...propsRest } = props;
     
-    const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-        updateBuffer(evt.target.value);
+    const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
+        updateBuffer(evt.target.checked);
         
         // Call user-defined `onChange`, if any
         if (typeof propsRest.onChange === 'function') { propsRest.onChange(evt); }
     }, [updateBuffer, propsRest.onChange]);
     
     return (
-        <textarea
+        <input
             ref={ref}
-            value={buffer}
+            type="checkbox"
+            checked={buffer}
             {...propsRest}
             className={cx(propsRest.className)}
             onChange={handleChange}
         />
     );
 });
-TextAreaControl.displayName = 'TextAreaControl';
+CheckboxControl.displayName = 'CheckboxControl';
 
-export const connectText = ConnectAccessor<TextBuffer, TextAreaControlProps>(TextAreaControl);
+export const connectText = ConnectAccessor<CheckboxBuffer, CheckboxControlProps>(CheckboxControl);

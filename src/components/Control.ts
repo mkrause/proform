@@ -17,5 +17,6 @@ Design notes:
 
 export type ControlBufferProps<B> = {
     buffer: B,
-    updateBuffer: (bufferUpdated: Updater<B>) => void,
+    //updateBuffer: (bufferUpdated: Updater<B>) => void, // FIXME
+    updateBuffer: (bufferUpdated: B) => void,
 };

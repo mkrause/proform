@@ -6,7 +6,7 @@ import type { ControlBufferProps } from '../components/Control'; // .js
 import { ConnectAccessor } from '../Accessor'; // .js
 
 
-export type OptionKey = string | number; // TODO: symbol?
+export type OptionKey = string | number;
 export type Option = {
     label: string,
 };
