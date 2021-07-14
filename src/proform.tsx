@@ -1,23 +1,23 @@
 
 import * as O from 'optics-ts';
 
-import { classNames as cx, ComponentPropsWithoutRef } from './util/components'; // .js
-import type { ClassNameArgument } from './util/components'; // .js
+import { classNames as cx, ComponentPropsWithoutRef } from './util/components';
+import type { ClassNameArgument } from './util/components';
 import * as React from 'react';
 
-import * as Ctx from './context/FormContext'; // .js
-import { useAccessorFor } from './Accessor'; // .js
-import type { ControlBufferProps } from './components/Control'; // .js
+import * as Ctx from './context/FormContext';
+import { useAccessorFor } from './Accessor';
+import type { ControlBufferProps } from './components/Control';
 
-import { connectText } from './controls/TextControl'; // .js
-import { connectTextArea } from './controls/TextAreaControl'; // .js
-import { connectCheckbox } from './controls/CheckboxControl'; // .js
-import { connectRadio, RadioControl } from './controls/RadioControl'; // .js
-import { connectSelect } from './controls/SelectControl'; // .js
-import { connectSelectField } from './fields/SelectField'; // .js
-import { connectField } from './components/Field'; // .js
-import { connectForm, connectFormNested } from './components/Form'; // .js
-import { useValidationFor, connectValidationMessage } from './components/ValidationMessage'; // .js
+import { connectText } from './controls/TextControl';
+import { connectTextArea } from './controls/TextAreaControl';
+import { connectCheckbox } from './controls/CheckboxControl';
+import { connectRadioButton, connectRadio, RadioControl } from './controls/RadioControl';
+import { connectSelect } from './controls/SelectControl';
+import { connectSelectField } from './fields/SelectField';
+import { connectField } from './components/Field';
+import { connectForm, connectFormNested } from './components/Form';
+import { useValidationFor, connectValidationMessage } from './components/ValidationMessage';
 
 
 export const makeForm = <A,>() => {
@@ -72,6 +72,7 @@ export const makeForm = <A,>() => {
         Text: connectText(FormContext),
         TextArea: connectTextArea(FormContext),
         Checkbox: connectCheckbox(FormContext),
+        RadioButton: connectRadioButton(FormContext),
         Radio: Object.assign(connectRadio(FormContext), { RadioButton: RadioControl.RadioButton }),
         Select: connectSelect(FormContext),
         SelectField: connectSelectField(FormContext)(connectSelect(FormContext)),

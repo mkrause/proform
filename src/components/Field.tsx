@@ -3,8 +3,8 @@ import * as O from 'optics-ts';
 
 import * as React from 'react';
 
-import * as Ctx from '../context/FormContext'; // .js
-import { Accessor, AccessorProp, parseAccessor } from '../Accessor'; // .js
+import * as Ctx from '../context/FormContext';
+import { Accessor, AccessorProp, parseAccessor } from '../Accessor';
 
 
 export type FieldContext<A, F> = {

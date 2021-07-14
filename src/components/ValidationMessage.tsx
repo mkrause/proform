@@ -3,9 +3,9 @@ import * as O from 'optics-ts';
 
 import * as React from 'react';
 
-import { ValidationError } from '../context/Validation'; // .js
-import * as Ctx from '../context/FormContext'; // .js
-import { Optic, isLens, Accessor, parseAccessor } from '../Accessor'; // .js
+import { ValidationError } from '../context/Validation';
+import * as Ctx from '../context/FormContext';
+import { Optic, isLens, Accessor, parseAccessor } from '../Accessor';
 
 
 // Hook to get the result of an accessor in the current form context

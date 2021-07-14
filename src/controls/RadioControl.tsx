@@ -1,11 +1,11 @@
 
-import { generateRandomId } from '../util/random'; // .js
+import { generateRandomId } from '../util/random';
 
-import { classNames as cx, ComponentPropsWithRef } from '../util/components'; // .js
+import { classNames as cx, ComponentPropsWithRef } from '../util/components';
 import * as React from 'react';
 
-import type { ControlBufferProps } from '../components/Control'; // .js
-import { ConnectAccessor } from '../Accessor'; // .js
+import type { ControlBufferProps } from '../components/Control';
+import { ConnectAccessor } from '../Accessor';
 
 
 export type RadioButtonBuffer = boolean;
@@ -32,6 +32,8 @@ export const RadioButtonControl = React.forwardRef<HTMLInputElement, RadioButton
     );
 });
 RadioButtonControl.displayName = 'RadioButtonControl';
+
+export const connectRadioButton = ConnectAccessor<RadioButtonBuffer, RadioButtonControlProps>(RadioButtonControl);
 
 
 export type OptionKey = string | number;

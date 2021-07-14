@@ -1,9 +1,9 @@
 
-import { classNames as cx, ComponentPropsWithRef } from '../util/components'; // .js
+import { classNames as cx, ComponentPropsWithRef } from '../util/components';
 import * as React from 'react';
 
-import type { ControlBufferProps } from '../components/Control'; // .js
-import { ConnectAccessor } from '../Accessor'; // .js
+import type { ControlBufferProps } from '../components/Control';
+import { ConnectAccessor } from '../Accessor';
 
 
 export type OptionKey = string | number;

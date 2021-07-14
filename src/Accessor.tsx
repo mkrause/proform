@@ -1,14 +1,14 @@
 
 import $msg from 'message-tag';
 
-import type { Updater } from './util/types'; // .js
+import type { Updater } from './util/types';
 import * as O from 'optics-ts';
 //import type { DottedPath } from 'optics-ts/dist/lib/utils';
 
 import * as React from 'react';
 
-import * as Ctx from './context/FormContext'; // .js
-import type { ControlBufferProps } from './components/Control'; // .js
+import * as Ctx from './context/FormContext';
+import type { ControlBufferProps } from './components/Control';
 
 
 type Optional<A> = undefined | A;

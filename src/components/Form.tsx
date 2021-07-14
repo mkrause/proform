@@ -1,8 +1,8 @@
 
-import { classNames as cx, ComponentPropsWithRef } from '../util/components'; // .js
+import { classNames as cx, ComponentPropsWithRef } from '../util/components';
 import * as React from 'react';
 
-import { FormContext, useForm } from '../context/FormContext'; // .js
+import { FormContext, useForm } from '../context/FormContext';
 
 
 type FormProps = ComponentPropsWithRef<'form'> & {
