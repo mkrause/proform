@@ -97,8 +97,6 @@ describe('CheckboxGroupControl', () => {
     });
     
     test('should update buffer on change (controlled)', () => {
-        const updateBufferMock = jest.fn();
-        
         const { getByTestId } = setupControlled({
             initialBuffer: ['b'],
             options: { a: {}, b: {}, c: {} },

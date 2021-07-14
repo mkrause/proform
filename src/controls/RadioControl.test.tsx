@@ -5,27 +5,27 @@ import * as React from 'react';
 import * as TL from '@testing-library/react';
 import fireUserEvent from '@testing-library/user-event';
 
-import type { RadioButtonBuffer, RadioBuffer } from './RadioControl';
-import { RadioButtonControl, RadioControl } from './RadioControl';
+import type { RadioBuffer } from './RadioControl';
+import { RadioControl } from './RadioControl';
 
 
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-describe('RadioButtonControl', () => {
-    // Controlled variant of `RadioButtonControl`
-    type RadioButtonControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof RadioButtonControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: RadioButtonBuffer,
+describe('RadioControl', () => {
+    // Controlled variant of `RadioControl`
+    type RadioControlControlledProps =
+        Omit<React.ComponentPropsWithRef<typeof RadioControl>, 'buffer' | 'updateBuffer'> & {
+            initialBuffer?: RadioBuffer,
         };
-    const RadioButtonControlControlled = ({ initialBuffer = false, ...props }: RadioButtonControlControlledProps) => {
+    const RadioControlControlled = ({ initialBuffer = false, ...props }: RadioControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(initialBuffer);
-        return <RadioButtonControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
+        return <RadioControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
-    const setup = (props: Partial<React.ComponentPropsWithRef<typeof RadioButtonControl>> = {}) => {
+    const setup = (props: Partial<React.ComponentPropsWithRef<typeof RadioControl>> = {}) => {
         const utils = TL.render(
-            <RadioButtonControl data-label="radio-button-control" buffer={false} updateBuffer={() => {}} {...props}/>
+            <RadioControl data-label="radio-button-control" buffer={false} updateBuffer={() => {}} {...props}/>
         );
         
         return {
@@ -33,9 +33,9 @@ describe('RadioButtonControl', () => {
             element: utils.getByTestId('radio-button-control'),
         };
     };
-    const setupControlled = (props: Partial<React.ComponentPropsWithRef<typeof RadioButtonControlControlled>> = {}) => {
+    const setupControlled = (props: Partial<React.ComponentPropsWithRef<typeof RadioControlControlled>> = {}) => {
         const utils = TL.render(
-            <RadioButtonControlControlled data-label="radio-button-control" {...props}/>
+            <RadioControlControlled data-label="radio-button-control" {...props}/>
         );
         
         return {
@@ -103,110 +103,5 @@ describe('RadioButtonControl', () => {
         fireUserEvent.click(element);
         
         expect(element).toBeChecked();
-    });
-});
-
-describe('RadioControl', () => {
-    // Controlled variant of `RadioControl`
-    type RadioControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof RadioControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: string,
-        };
-    const RadioControlControlled = ({ initialBuffer, ...props }: RadioControlControlledProps) => {
-        const [buffer, setBuffer] = React.useState(() => {
-            return initialBuffer ?? null;
-        });
-        return <RadioControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
-    };
-    
-    const setup = (props: PartialBy<React.ComponentPropsWithRef<typeof RadioControl>, 'buffer' | 'updateBuffer'>) => {
-        const utils = TL.render(
-            <div data-label="radio-control">
-                <RadioControl buffer={null} updateBuffer={() => {}} {...props}/>
-            </div>
-        );
-        
-        return {
-            ...utils,
-            element: utils.getByTestId('radio-control'),
-        };
-    };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof RadioControlControlled>) => {
-        const utils = TL.render(
-            <div data-label="radio-control">
-                <RadioControlControlled data-label="radio-control" {...props}/>
-            </div>
-        );
-        
-        return {
-            ...utils,
-            element: utils.getByTestId('radio-control'),
-        };
-    };
-    
-    beforeEach(TL.cleanup);
-    
-    test('should render a radio control', () => {
-        const { queryAllByRole } = setup({
-            id: 'test-radio',
-            options: { a: {}, b: {}, c: {} },
-            children: <>
-                <RadioControl.RadioButton option="a"/>
-                <RadioControl.RadioButton option="b"/>
-                <RadioControl.RadioButton option="c"/>
-            </>,
-        });
-        
-        const radioButtons = queryAllByRole('radio');
-        
-        expect(radioButtons.length).toBe(3);
-        
-        for (const radioButton of radioButtons) {
-            expect(radioButton).toBeInstanceOf(HTMLInputElement);
-            expect(radioButton).toHaveClass('', { exact: true });
-            expect(radioButton).toHaveAttribute('type', 'radio');
-            expect(radioButton).toHaveAttribute('name', 'test-radio');
-        }
-    });
-    
-    test('should update buffer on change', () => {
-        const updateBufferMock = jest.fn();
-        
-        const { getByTestId } = setup({
-            buffer: 'b',
-            updateBuffer: updateBufferMock,
-            options: { a: {}, b: {}, c: {} },
-            children: <>
-                <RadioControl.RadioButton data-label="option-a" option="a"/>
-                <RadioControl.RadioButton data-label="option-b" option="b"/>
-                <RadioControl.RadioButton data-label="option-c" option="c"/>
-            </>,
-        });
-        
-        TL.fireEvent.click(getByTestId('option-c'));
-        
-        expect(updateBufferMock).toHaveBeenCalledTimes(1);
-        expect(updateBufferMock).toHaveBeenCalledWith('c');
-    });
-    
-    test('should update buffer on change (controlled)', () => {
-        const updateBufferMock = jest.fn();
-        
-        const { getByTestId } = setupControlled({
-            initialBuffer: 'b',
-            options: { a: {}, b: {}, c: {} },
-            children: <>
-                <RadioControl.RadioButton data-label="option-a" option="a"/>
-                <RadioControl.RadioButton data-label="option-b" option="b"/>
-                <RadioControl.RadioButton data-label="option-c" option="c"/>
-            </>,
-        });
-        
-        // Simulate click to select radio
-        fireUserEvent.click(getByTestId('option-c'));
-        
-        expect(getByTestId('option-a')).not.toBeChecked();
-        expect(getByTestId('option-b')).not.toBeChecked();
-        expect(getByTestId('option-c')).toBeChecked();
     });
 });

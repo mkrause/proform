@@ -49,7 +49,7 @@ export const test = () => {
     type LegalEntityType = 'private' | 'business';
     type UserInterest = 'music' | 'culture' | 'politics' | 'science' | 'tech';
     type User = {
-        gender: 'male' | 'female' | 'other',
+        gender: null | 'male' | 'female' | 'other',
         //role: UserRole,
         name: string,
         email: string,
@@ -69,7 +69,7 @@ export const test = () => {
         const interests = ['music', 'culture', 'politics', 'science', 'tech'];
         
         const [buffer, setBuffer] = React.useState<User>({
-            gender: 'male',
+            gender: null,
             //role: 'user',
             name: '',
             email: '',
@@ -258,22 +258,22 @@ export const test = () => {
                         
                         <div className="radio-group">
                             <span className="radio-group__label">Gender</span>
-                            <Form.Radio accessor="gender" id="gender"
+                            <Form.RadioGroup accessor="gender" id="gender"
                                 options={{ male: {}, female: {}, other: {} }}
                             >
                                 <label>
-                                    <Form.Radio.RadioButton option="male"/>
+                                    <Form.RadioGroup.Radio option="male"/>
                                     Male
                                 </label>
                                 <label>
-                                    <Form.Radio.RadioButton option="female"/>
+                                    <Form.RadioGroup.Radio option="female"/>
                                     Female
                                 </label>
                                 <label>
-                                    <Form.Radio.RadioButton option="other"/>
+                                    <Form.RadioGroup.Radio option="other"/>
                                     Prefer not to say
                                 </label>
-                            </Form.Radio>
+                            </Form.RadioGroup>
                         </div>
                         
                         <TextField

@@ -13,7 +13,8 @@ import { connectText } from './controls/TextControl';
 import { connectTextArea } from './controls/TextAreaControl';
 import { connectCheckbox } from './controls/CheckboxControl';
 import { connectCheckboxGroup, CheckboxGroupControl } from './controls/CheckboxGroupControl';
-import { connectRadioButton, connectRadio, RadioControl } from './controls/RadioControl';
+import { connectRadio, RadioControl } from './controls/RadioControl';
+import { connectRadioGroup, RadioGroupControl } from './controls/RadioGroupControl';
 import { connectSelect } from './controls/SelectControl';
 import { connectSelectField } from './fields/SelectField';
 import { connectField } from './components/Field';
@@ -74,8 +75,8 @@ export const makeForm = <A,>() => {
         TextArea: connectTextArea(FormContext),
         Checkbox: connectCheckbox(FormContext),
         CheckboxGroup: Object.assign(connectCheckboxGroup(FormContext), { Checkbox: CheckboxGroupControl.Checkbox }),
-        RadioButton: connectRadioButton(FormContext),
-        Radio: Object.assign(connectRadio(FormContext), { RadioButton: RadioControl.RadioButton }),
+        Radio: connectRadio(FormContext),
+        RadioGroup: Object.assign(connectRadioGroup(FormContext), { Radio: RadioGroupControl.Radio }),
         Select: connectSelect(FormContext),
         SelectField: connectSelectField(FormContext)(connectSelect(FormContext)),
         
