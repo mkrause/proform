@@ -114,11 +114,7 @@ describe('RadioControl', () => {
         };
     const RadioControlControlled = ({ initialBuffer, ...props }: RadioControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(() => {
-            const optionKeys = ObjectUtil.keys(props.options);
-            if (optionKeys.length === 0) { throw new TypeError(`Expected at least one option`); }
-            
-            const optionDefault = optionKeys[0];
-            return initialBuffer ?? optionDefault
+            return initialBuffer ?? null;
         });
         return <RadioControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };

@@ -68,7 +68,11 @@ const RadioButtonControlConnected = React.forwardRef<
             throw new TypeError(`Missing RadioControl context provider`);
         }
         
-        const { id, optionSelected, updateOptionSelected } = context;
+        const { id, options, optionSelected, updateOptionSelected } = context;
+        
+        if (!Object.keys(options).includes(String(option))) {
+            throw new TypeError(`Invalid option ${option}`);
+        }
         
         return (
             <RadioButtonControl

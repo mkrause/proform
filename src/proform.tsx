@@ -12,6 +12,7 @@ import type { ControlBufferProps } from './components/Control';
 import { connectText } from './controls/TextControl';
 import { connectTextArea } from './controls/TextAreaControl';
 import { connectCheckbox } from './controls/CheckboxControl';
+import { connectCheckboxGroup, CheckboxGroupControl } from './controls/CheckboxGroupControl';
 import { connectRadioButton, connectRadio, RadioControl } from './controls/RadioControl';
 import { connectSelect } from './controls/SelectControl';
 import { connectSelectField } from './fields/SelectField';
@@ -72,6 +73,7 @@ export const makeForm = <A,>() => {
         Text: connectText(FormContext),
         TextArea: connectTextArea(FormContext),
         Checkbox: connectCheckbox(FormContext),
+        CheckboxGroup: Object.assign(connectCheckboxGroup(FormContext), { Checkbox: CheckboxGroupControl.Checkbox }),
         RadioButton: connectRadioButton(FormContext),
         Radio: Object.assign(connectRadio(FormContext), { RadioButton: RadioControl.RadioButton }),
         Select: connectSelect(FormContext),

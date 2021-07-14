@@ -66,6 +66,8 @@ export const test = () => {
     
     //const Form = Proform.makeForm<User>();
     const TestApp = () => {
+        const interests = ['music', 'culture', 'politics', 'science', 'tech'];
+        
         const [buffer, setBuffer] = React.useState<User>({
             gender: 'male',
             //role: 'user',
@@ -269,7 +271,7 @@ export const test = () => {
                                 </label>
                                 <label>
                                     <Form.Radio.RadioButton option="other"/>
-                                    Other / I'd rather not say
+                                    Prefer not to say
                                 </label>
                             </Form.Radio>
                         </div>
@@ -353,6 +355,26 @@ export const test = () => {
                                 accessor="interests"
                             />
                         </label>
+                        
+                        <div className="checkbox-group">
+                            <span className="radio-group__label">Interests</span>
+                            <Form.CheckboxGroup accessor="interests" id="interests"
+                                options={{
+                                    'music': {},
+                                    'culture': {},
+                                    'politics': {},
+                                    'science': {},
+                                    'tech': {},
+                                }}
+                            >
+                                {interests.map(interest =>
+                                    <label key={interest}>
+                                        <Form.CheckboxGroup.Checkbox option={interest}/>
+                                        {interest.charAt(0).toUpperCase() + interest.slice(1)}
+                                    </label>
+                                )}
+                            </Form.CheckboxGroup>
+                        </div>
                         
                         <label>
                             Additional remarks
