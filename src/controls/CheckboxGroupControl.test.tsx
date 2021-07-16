@@ -13,12 +13,13 @@ import { CheckboxGroupControl } from './CheckboxGroupControl';
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+type CheckboxGroupControlProps = React.ComponentPropsWithoutRef<typeof CheckboxGroupControl>;
+
 describe('CheckboxGroupControl', () => {
     // Controlled variant of `CheckboxGroupControl`
-    type CheckboxGroupControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof CheckboxGroupControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: Array<string>,
-        };
+    type CheckboxGroupControlControlledProps = Omit<CheckboxGroupControlProps, 'buffer' | 'updateBuffer'> & {
+        initialBuffer?: Array<string>,
+    };
     const CheckboxGroupControlControlled = ({ initialBuffer, ...props }: CheckboxGroupControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(() => {
             return initialBuffer ?? [];
@@ -26,7 +27,7 @@ describe('CheckboxGroupControl', () => {
         return <CheckboxGroupControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
-    const setup = (props: PartialBy<React.ComponentPropsWithRef<typeof CheckboxGroupControl>, 'buffer' | 'updateBuffer'>) => {
+    const setup = (props: PartialBy<CheckboxGroupControlProps, 'buffer' | 'updateBuffer'>) => {
         const utils = TL.render(
             <div data-label="checkbox-control">
                 <CheckboxGroupControl buffer={[]} updateBuffer={() => {}} {...props}/>
@@ -38,7 +39,7 @@ describe('CheckboxGroupControl', () => {
             element: utils.getByTestId('checkbox-control'),
         };
     };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof CheckboxGroupControlControlled>) => {
+    const setupControlled = (props: CheckboxGroupControlControlledProps) => {
         const utils = TL.render(
             <div data-label="checkbox-control">
                 <CheckboxGroupControlControlled data-label="checkbox-control" {...props}/>
@@ -53,7 +54,7 @@ describe('CheckboxGroupControl', () => {
     
     beforeEach(TL.cleanup);
     
-    test('should render a checkbox control', () => {
+    test('should render multiple checkbox controls', () => {
         const { queryAllByRole } = setup({
             id: 'test-checkbox',
             options: { a: {}, b: {}, c: {} },

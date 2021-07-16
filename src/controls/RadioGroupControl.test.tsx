@@ -13,12 +13,13 @@ import { RadioGroupControl } from './RadioGroupControl';
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+type RadioGroupControlProps = React.ComponentPropsWithoutRef<typeof RadioGroupControl>;
+
 describe('RadioGroupControl', () => {
     // Controlled variant of `RadioGroupControl`
-    type RadioGroupControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof RadioGroupControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: string,
-        };
+    type RadioGroupControlControlledProps = Omit<RadioGroupControlProps, 'buffer' | 'updateBuffer'> & {
+        initialBuffer?: string,
+    };
     const RadioGroupControlControlled = ({ initialBuffer, ...props }: RadioGroupControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(() => {
             return initialBuffer ?? null;
@@ -26,7 +27,7 @@ describe('RadioGroupControl', () => {
         return <RadioGroupControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
-    const setup = (props: PartialBy<React.ComponentPropsWithRef<typeof RadioGroupControl>, 'buffer' | 'updateBuffer'>) => {
+    const setup = (props: PartialBy<RadioGroupControlProps, 'buffer' | 'updateBuffer'>) => {
         const utils = TL.render(
             <div data-label="radio-control">
                 <RadioGroupControl buffer={null} updateBuffer={() => {}} {...props}/>
@@ -38,7 +39,7 @@ describe('RadioGroupControl', () => {
             element: utils.getByTestId('radio-control'),
         };
     };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof RadioGroupControlControlled>) => {
+    const setupControlled = (props: RadioGroupControlControlledProps) => {
         const utils = TL.render(
             <div data-label="radio-control">
                 <RadioGroupControlControlled data-label="radio-control" {...props}/>
@@ -53,7 +54,7 @@ describe('RadioGroupControl', () => {
     
     beforeEach(TL.cleanup);
     
-    test('should render a radio control', () => {
+    test('should render multiple radio controls', () => {
         const { queryAllByRole } = setup({
             id: 'test-radio',
             options: { a: {}, b: {}, c: {} },

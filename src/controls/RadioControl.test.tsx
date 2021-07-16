@@ -12,18 +12,19 @@ import { RadioControl } from './RadioControl';
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+type RadioControlProps = React.ComponentPropsWithRef<typeof RadioControl>;
+
 describe('RadioControl', () => {
     // Controlled variant of `RadioControl`
-    type RadioControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof RadioControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: RadioBuffer,
-        };
+    type RadioControlControlledProps = Omit<RadioControlProps, 'buffer' | 'updateBuffer'> & {
+        initialBuffer?: RadioBuffer,
+    };
     const RadioControlControlled = ({ initialBuffer = false, ...props }: RadioControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(initialBuffer);
         return <RadioControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
-    const setup = (props: Partial<React.ComponentPropsWithRef<typeof RadioControl>> = {}) => {
+    const setup = (props: Partial<RadioControlProps> = {}) => {
         const utils = TL.render(
             <RadioControl data-label="radio-button-control" buffer={false} updateBuffer={() => {}} {...props}/>
         );
@@ -33,7 +34,7 @@ describe('RadioControl', () => {
             element: utils.getByTestId('radio-button-control'),
         };
     };
-    const setupControlled = (props: Partial<React.ComponentPropsWithRef<typeof RadioControlControlled>> = {}) => {
+    const setupControlled = (props: RadioControlControlledProps = {}) => {
         const utils = TL.render(
             <RadioControlControlled data-label="radio-button-control" {...props}/>
         );
@@ -68,14 +69,28 @@ describe('RadioControl', () => {
     });
     
     test('should preserve user-defined `onChange`', () => {
-        const onChangeMock = jest.fn();
+        const onChangeMock = jest.fn((event: React.ChangeEvent<HTMLInputElement>) => event.target.checked);
         
         const { element } = setup({ onChange: onChangeMock });
         
         TL.fireEvent.click(element);
         
+        expect(element).not.toBeChecked(); // Note: updated value was not saved because our `onUpdate` ignores it
         expect(onChangeMock).toHaveBeenCalledTimes(1);
         expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ target: element }));
+        expect(onChangeMock).toHaveReturnedWith(true);
+    });
+    
+    test('should render an unchecked radio control when buffer is `false`', () => {
+        const { element } = setup({ buffer: false });
+        
+        expect(element).not.toBeChecked();
+    });
+    
+    test('should render a checked radio control when buffer is `true`', () => {
+        const { element } = setup({ buffer: true });
+        
+        expect(element).toBeChecked();
     });
     
     test('should update buffer on input', () => {

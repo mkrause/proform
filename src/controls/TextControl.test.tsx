@@ -25,7 +25,7 @@ describe('TextControl', () => {
         props: PartialBy<React.ComponentPropsWithRef<typeof TextControl>, 'buffer' | 'updateBuffer'> = {},
     ) => {
         const utils = TL.render(
-            <TextControl data-label="text-control" buffer="test" updateBuffer={() => {}} {...props}/>
+            <TextControl data-label="text-control" buffer="" updateBuffer={() => {}} {...props}/>
         );
         
         return {
@@ -50,7 +50,7 @@ describe('TextControl', () => {
         
         expect(element).toBeInstanceOf(HTMLInputElement);
         expect(element).toHaveClass('', { exact: true });
-        expect(element).toHaveValue('test');
+        expect(element).toHaveValue('');
         expect(element).toHaveAttribute('type', 'text');
     });
     
@@ -58,6 +58,7 @@ describe('TextControl', () => {
         const ref = React.createRef<HTMLInputElement>();
         const { element } = setup({ ref });
         
+        expect(ref).toHaveProperty('current');
         expect(ref.current).toBeInstanceOf(HTMLInputElement);
         expect(ref.current).toBe(element);
     });
@@ -68,16 +69,22 @@ describe('TextControl', () => {
     });
     
     test('should preserve user-defined `onChange`', () => {
-        const onChangeMock = jest.fn();
+        const onChangeMock = jest.fn((event: React.ChangeEvent<HTMLInputElement>) => event.target.value);
         
         const { element } = setup({ onChange: onChangeMock });
         
         TL.fireEvent.change(element, { target: { value: 'updated' } });
         
+        expect(element).toHaveValue(''); // Note: updated value was not saved because our `onUpdate` ignores it
         expect(onChangeMock).toHaveBeenCalledTimes(1);
-        expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({
-            target: element,
-        }));
+        expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ target: element }));
+        expect(onChangeMock).toHaveReturnedWith('updated');
+    });
+    
+    test('should render a text control with the current buffer as value', () => {
+        const { element } = setup({ buffer: 'test' });
+        
+        expect(element).toHaveValue('test');
     });
     
     test('should update buffer on input', () => {

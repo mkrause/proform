@@ -3,29 +3,29 @@ import * as React from 'react';
 import * as TL from '@testing-library/react';
 import fireUserEvent from '@testing-library/user-event';
 
-import type { CheckboxBuffer } from './CheckboxControl';
-import { CheckboxControl } from './CheckboxControl';
+import type { CheckboxIndeterminateBuffer } from './CheckboxIndeterminateControl';
+import { CheckboxIndeterminateControl } from './CheckboxIndeterminateControl';
 
 
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-describe('CheckboxControl', () => {
-    // Controlled variant of `CheckboxControl`
-    type CheckboxControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof CheckboxControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: CheckboxBuffer,
+type CheckboxIndeterminateControlProps = React.ComponentPropsWithRef<typeof CheckboxIndeterminateControl>;
+
+describe('CheckboxIndeterminateControl', () => {
+    // Controlled variant of `CheckboxIndeterminateControl`
+    type CheckboxIndeterminateControlControlledProps =
+        Omit<CheckboxIndeterminateControlProps, 'buffer' | 'updateBuffer'> & {
+            initialBuffer?: CheckboxIndeterminateBuffer,
         };
-    const CheckboxControlControlled = ({ initialBuffer = false, ...props }: CheckboxControlControlledProps) => {
+    const CheckboxIndeterminateControlControlled = ({ initialBuffer = false, ...props }: CheckboxIndeterminateControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(initialBuffer);
-        return <CheckboxControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
+        return <CheckboxIndeterminateControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
-    const setup = (
-        props: PartialBy<React.ComponentPropsWithRef<typeof CheckboxControl>, 'buffer' | 'updateBuffer'> = {},
-    ) => {
+    const setup = (props: PartialBy<CheckboxIndeterminateControlProps, 'buffer' | 'updateBuffer'> = {}) => {
         const utils = TL.render(
-            <CheckboxControl data-label="text-control" buffer={false} updateBuffer={() => {}} {...props}/>
+            <CheckboxIndeterminateControl data-label="text-control" buffer={false} updateBuffer={() => {}} {...props}/>
         );
         
         return {
@@ -33,9 +33,9 @@ describe('CheckboxControl', () => {
             element: utils.getByTestId('text-control'),
         };
     };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof CheckboxControlControlled> = {}) => {
+    const setupControlled = (props: React.ComponentPropsWithRef<typeof CheckboxIndeterminateControlControlled> = {}) => {
         const utils = TL.render(
-            <CheckboxControlControlled data-label="text-control" {...props}/>
+            <CheckboxIndeterminateControlControlled data-label="text-control" {...props}/>
         );
         
         return {
@@ -58,7 +58,6 @@ describe('CheckboxControl', () => {
         const ref = React.createRef<HTMLInputElement>();
         const { element } = setup({ ref });
         
-        expect(ref).toHaveProperty('current');
         expect(ref.current).toBeInstanceOf(HTMLInputElement);
         expect(ref.current).toBe(element);
     });
@@ -97,6 +96,14 @@ describe('CheckboxControl', () => {
         expect(element).not.toBePartiallyChecked();
     });
     
+    test('should render a partially checked checkbox control when buffer is `null`', () => {
+        const { element } = setup({ buffer: null });
+        
+        expect(element).toBeInstanceOf(HTMLInputElement);
+        expect(element).not.toBeChecked();
+        expect(element).toBePartiallyChecked();
+    });
+    
     test('should toggle buffer between false/true on change', () => {
         const updateBufferMock = jest.fn();
         
@@ -111,6 +118,8 @@ describe('CheckboxControl', () => {
     });
     
     test('should toggle buffer between false/true on change (controlled)', () => {
+        // Note: no way to trigger the indeterminate state from the UI (only programmatically through `buffer`)
+        
         const { element } = setupControlled({ initialBuffer: false });
         
         // Simulate click to check on

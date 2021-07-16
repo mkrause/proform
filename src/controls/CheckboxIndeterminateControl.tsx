@@ -26,7 +26,7 @@ const useCombinedRefs = (...refs: Array<Ref<null | HTMLInputElement>>): React.Re
     return refCombined;
 };
 
-export type CheckboxIndeterminateBuffer = boolean;
+export type CheckboxIndeterminateBuffer = null | boolean;
 
 type CheckboxIndeterminateControlProps = ComponentPropsWithRef<'input'> & ControlBufferProps<CheckboxIndeterminateBuffer>;
 export const CheckboxIndeterminateControl = React.forwardRef<HTMLInputElement, CheckboxIndeterminateControlProps>(
@@ -57,7 +57,7 @@ export const CheckboxIndeterminateControl = React.forwardRef<HTMLInputElement, C
             <input
                 ref={ref}
                 type="checkbox"
-                checked={buffer}
+                checked={buffer ?? false}
                 {...propsRest}
                 className={cx(propsRest.className)}
                 onChange={handleChange}

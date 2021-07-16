@@ -10,22 +10,23 @@ import { TextAreaControl } from './TextAreaControl';
 // https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+type TextAreaControlProps = React.ComponentPropsWithRef<typeof TextAreaControl>;
+
 describe('TextAreaControl', () => {
     // Controlled variant of `TextAreaControl`
-    type TextAreaControlControlledProps =
-        Omit<React.ComponentPropsWithRef<typeof TextAreaControl>, 'buffer' | 'updateBuffer'> & {
-            initialBuffer?: TextBuffer,
-        };
+    type TextAreaControlControlledProps = Omit<TextAreaControlProps, 'buffer' | 'updateBuffer'> & {
+        initialBuffer?: TextBuffer,
+    };
     const TextAreaControlControlled = ({ initialBuffer = '', ...props }: TextAreaControlControlledProps) => {
         const [buffer, setBuffer] = React.useState(initialBuffer);
         return <TextAreaControl buffer={buffer} updateBuffer={setBuffer} {...props}/>;
     };
     
     const setup = (
-        props: PartialBy<React.ComponentPropsWithRef<typeof TextAreaControl>, 'buffer' | 'updateBuffer'> = {},
+        props: PartialBy<TextAreaControlProps, 'buffer' | 'updateBuffer'> = {},
     ) => {
         const utils = TL.render(
-            <TextAreaControl data-label="text-area-control" buffer="test" updateBuffer={() => {}} {...props}/>
+            <TextAreaControl data-label="text-area-control" buffer="" updateBuffer={() => {}} {...props}/>
         );
         
         return {
@@ -33,7 +34,7 @@ describe('TextAreaControl', () => {
             element: utils.getByTestId('text-area-control'),
         };
     };
-    const setupControlled = (props: React.ComponentPropsWithRef<typeof TextAreaControlControlled> = {}) => {
+    const setupControlled = (props: TextAreaControlControlledProps = {}) => {
         const utils = TL.render(
             <TextAreaControlControlled data-label="text-area-control" {...props}/>
         );
@@ -46,12 +47,12 @@ describe('TextAreaControl', () => {
     
     beforeEach(TL.cleanup);
     
-    test('should render a text control', () => {
+    test('should render a text area control', () => {
         const { element } = setup();
         
         expect(element).toBeInstanceOf(HTMLTextAreaElement);
         expect(element).toHaveClass('', { exact: true });
-        expect(element).toHaveValue('test');
+        expect(element).toHaveValue('');
     });
     
     test('should accept `ref`', () => {
@@ -62,22 +63,28 @@ describe('TextAreaControl', () => {
         expect(ref.current).toBe(element);
     });
     
-    test('should render a text control with the given `className`', () => {
+    test('should render a text area control with the given `className`', () => {
         const { element } = setup({ className: 'foo' });
         expect(element).toHaveClass('foo', { exact: true });
     });
     
     test('should preserve user-defined `onChange`', () => {
-        const onChangeMock = jest.fn();
+        const onChangeMock = jest.fn((event: React.ChangeEvent<HTMLTextAreaElement>) => event.target.value);
         
         const { element } = setup({ onChange: onChangeMock });
         
         TL.fireEvent.change(element, { target: { value: 'updated' } });
         
+        expect(element).toHaveValue(''); // Note: updated value was not saved because our `onUpdate` ignores it
         expect(onChangeMock).toHaveBeenCalledTimes(1);
-        expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({
-            target: element,
-        }));
+        expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ target: element }));
+        expect(onChangeMock).toHaveReturnedWith('updated');
+    });
+    
+    test('should render a text area control with the current buffer as value', () => {
+        const { element } = setup({ buffer: 'test' });
+        
+        expect(element).toHaveValue('test');
     });
     
     test('should update buffer on input', () => {
