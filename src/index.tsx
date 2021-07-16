@@ -45,6 +45,10 @@ type Test = O.OpticFor<42>;
 */
 
 export const test = () => {
+    const capitalize = (string: string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+    
     //type UserRole = 'user' | 'admin';
     type LegalEntityType = 'private' | 'business';
     type UserInterest = 'music' | 'culture' | 'politics' | 'science' | 'tech';
@@ -370,7 +374,7 @@ export const test = () => {
                                 {interests.map(interest =>
                                     <label key={interest}>
                                         <Form.CheckboxGroup.Checkbox option={interest}/>
-                                        {interest.charAt(0).toUpperCase() + interest.slice(1)}
+                                        {capitalize(interest)}
                                     </label>
                                 )}
                             </Form.CheckboxGroup>

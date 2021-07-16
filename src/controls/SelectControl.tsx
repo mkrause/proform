@@ -11,13 +11,17 @@ export type Option = {
     label: string,
 };
 
-export type SelectBuffer = OptionKey;
+// Note: we want to allow either `null`, or a valid option as buffer. The reason we want to allow `null` is:
+// - In case we have zero options, we need some "empty" value.
+// - We may want to force the user to make the initial selection, rather than choosing something ourselves.
+export type SelectBuffer = null | OptionKey;
 
 type SelectControlProps = ComponentPropsWithRef<'select'> & ControlBufferProps<SelectBuffer> & {
+    placeholder?: string,
     options: Record<OptionKey, Option>,
 };
 export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlProps>((props, ref) => {
-    const { buffer, updateBuffer, options, ...propsRest } = props;
+    const { buffer, updateBuffer, placeholder = 'Select', options, ...propsRest } = props;
     
     const handleChange = React.useCallback((evt: React.ChangeEvent<HTMLSelectElement>) => {
         const optionKey: OptionKey = evt.target.value;
@@ -30,11 +34,12 @@ export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlPr
     return (
         <select
             ref={ref}
-            value={buffer}
+            value={buffer ?? ''}
             {...propsRest}
             className={cx(propsRest.className)}
             onChange={handleChange}
         >
+            <option value="" disabled hidden>{placeholder}</option>
             {Object.entries(options).map(([optionKey, option]) =>
                 <option key={optionKey} value={optionKey}>{option.label}</option>
             )}
