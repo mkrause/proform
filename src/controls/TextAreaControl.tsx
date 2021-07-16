@@ -31,4 +31,7 @@ export const TextAreaControl = React.forwardRef<HTMLTextAreaElement, TextAreaCon
 });
 TextAreaControl.displayName = 'TextAreaControl';
 
-export const connectTextArea = ConnectAccessor<TextBuffer, TextAreaControlProps>(TextAreaControl);
+export const connectTextArea = ConnectAccessor<TextBuffer, TextAreaControlProps>(
+    TextAreaControl,
+    { connectFormProp: true },
+);

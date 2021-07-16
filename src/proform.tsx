@@ -18,6 +18,7 @@ import { connectRadio, RadioControl } from './controls/RadioControl';
 import { connectRadioGroup, RadioGroupControl } from './controls/RadioGroupControl';
 import { connectSelect } from './controls/SelectControl';
 import { connectSelectField } from './fields/SelectField';
+import { connectSelectAll } from './controls/extra/SelectAllControl';
 import { connectField } from './components/Field';
 import { connectForm, connectFormNested } from './components/Form';
 import { useValidationFor, connectValidationMessage } from './components/ValidationMessage';
@@ -81,6 +82,8 @@ export const makeForm = <A,>() => {
         RadioGroup: Object.assign(connectRadioGroup(FormContext), { Radio: RadioGroupControl.Radio }),
         Select: connectSelect(FormContext),
         SelectField: connectSelectField(FormContext)(connectSelect(FormContext)),
+        
+        SelectAll: connectSelectAll(FormContext),
         
         // Validation
         useValidation: useValidationFor(FormContext),

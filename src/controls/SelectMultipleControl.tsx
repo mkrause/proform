@@ -44,4 +44,7 @@ export const SelectMultipleControl = React.forwardRef<HTMLSelectElement, SelectM
 });
 SelectMultipleControl.displayName = 'SelectMultipleControl';
 
-export const connectSelectMultiple = ConnectAccessor<SelectBuffer, SelectMultipleControlProps>(SelectMultipleControl);
+export const connectSelectMultiple = ConnectAccessor<SelectBuffer, SelectMultipleControlProps>(
+    SelectMultipleControl,
+    { connectFormProp: true },
+);

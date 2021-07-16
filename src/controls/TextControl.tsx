@@ -32,4 +32,7 @@ export const TextControl = React.forwardRef<HTMLInputElement, TextControlProps>(
 });
 TextControl.displayName = 'TextControl';
 
-export const connectText = ConnectAccessor<TextBuffer, TextControlProps>(TextControl);
+export const connectText = ConnectAccessor<TextBuffer, TextControlProps>(
+    TextControl,
+    { connectFormProp: true },
+);

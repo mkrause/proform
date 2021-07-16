@@ -32,4 +32,7 @@ export const CheckboxControl = React.forwardRef<HTMLInputElement, CheckboxContro
 });
 CheckboxControl.displayName = 'CheckboxControl';
 
-export const connectCheckbox = ConnectAccessor<CheckboxBuffer, CheckboxControlProps>(CheckboxControl);
+export const connectCheckbox = ConnectAccessor<CheckboxBuffer, CheckboxControlProps>(
+    CheckboxControl,
+    { connectFormProp: true },
+);

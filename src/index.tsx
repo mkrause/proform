@@ -70,7 +70,7 @@ export const test = () => {
     
     //const Form = Proform.makeForm<User>();
     const TestApp = () => {
-        const interests = ['music', 'culture', 'politics', 'science', 'tech'];
+        const interests = ['music', 'culture', 'politics', 'science', 'tech'] as const;
         
         const [buffer, setBuffer] = React.useState<User>({
             gender: null,
@@ -362,14 +362,17 @@ export const test = () => {
                         
                         <div className="checkbox-group">
                             <span className="radio-group__label">Interests</span>
+                            <label>
+                                <Form.SelectAll
+                                    accessor="interests"
+                                    options={interests}
+                                />
+                                
+                                Select all
+                            </label>
+                            
                             <Form.CheckboxGroup accessor="interests" id="interests"
-                                options={{
-                                    'music': {},
-                                    'culture': {},
-                                    'politics': {},
-                                    'science': {},
-                                    'tech': {},
-                                }}
+                                options={Object.fromEntries(interests.map(interest => [interest, {}]))}
                             >
                                 {interests.map(interest =>
                                     <label key={interest}>

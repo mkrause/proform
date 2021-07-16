@@ -48,4 +48,7 @@ export const SelectControl = React.forwardRef<HTMLSelectElement, SelectControlPr
 });
 SelectControl.displayName = 'SelectControl';
 
-export const connectSelect = ConnectAccessor<SelectBuffer, SelectControlProps>(SelectControl);
+export const connectSelect = ConnectAccessor<SelectBuffer, SelectControlProps>(
+    SelectControl,
+    { connectFormProp: true },
+);

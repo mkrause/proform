@@ -31,4 +31,7 @@ export const RadioControl = React.forwardRef<HTMLInputElement, RadioControlProps
 });
 RadioControl.displayName = 'RadioControl';
 
-export const connectRadio = ConnectAccessor<RadioBuffer, RadioControlProps>(RadioControl);
+export const connectRadio = ConnectAccessor<RadioBuffer, RadioControlProps>(
+    RadioControl,
+    { connectFormProp: true },
+);

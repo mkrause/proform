@@ -217,7 +217,13 @@ export type ConnectedControlBufferProps<A, F> = {
     accessor: Accessor<A, F>,
 };
 
-export const ConnectAccessor = <F, P extends ControlBufferProps<F>>(Component: React.ComponentType<P>) =>
+type ConnectAccessorOptions = {
+    connectFormProp?: boolean,
+};
+export const ConnectAccessor = <F, P extends ControlBufferProps<F>>(
+    Component: React.ComponentType<P>,
+    { connectFormProp = false }: ConnectAccessorOptions = {},
+) =>
     <A,>(FormContext: Ctx.FormContext<A>) => {
         type ElementRefT = React.ElementRef<typeof Component>;
         type RefT = React.PropsWithRef<P> extends { ref?: infer R } ? R : never;
@@ -234,9 +240,15 @@ export const ConnectAccessor = <F, P extends ControlBufferProps<F>>(Component: R
             // Note: TS will complain that `P` may be instantiated with a different subtype of `FieldBufferProps<F>`.
             // We assume (but cannot enforce in the type constraint) that this is not the case.
             // @ts-ignore
-            const propsWithRef: P = { ref, ...props, buffer, updateBuffer };
+            const propsWithRef: P = {
+                ...props,
+                ref,
+                buffer,
+                updateBuffer,
+                ...(connectFormProp && formId !== null ? { form: formId } : {})
+            };
             return (
-                <Component {...propsWithRef} form={formId}/>
+                <Component {...propsWithRef}/>
             );
         };
         const displayName = `ProformConnect(${Component.displayName ?? 'Anonymous'})`;
