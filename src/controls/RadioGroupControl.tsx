@@ -4,7 +4,7 @@ import { generateRandomId } from '../util/random';
 import { classNames as cx, ComponentPropsWithRef } from '../util/components';
 import * as React from 'react';
 
-import type { ControlBufferProps } from '../components/Control';
+import type { ControlBufferProps } from './Control';
 import { ConnectAccessor } from '../Accessor';
 
 import type { RadioBuffer } from './RadioControl';

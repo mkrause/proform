@@ -8,7 +8,7 @@ import * as O from 'optics-ts';
 import * as React from 'react';
 
 import * as Ctx from './context/FormContext';
-import type { ControlBufferProps } from './components/Control';
+import type { ControlBufferProps } from './controls/Control';
 
 
 type Optional<A> = undefined | A;

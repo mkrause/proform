@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import * as Ctx from '../context/FormContext';
 import type { ConnectedControlBufferProps } from '../Accessor';
-import type { ControlBufferProps } from '../components/Control';
+import type { ControlBufferProps } from '../controls/Control';
 
 import type { OptionKey, Option, SelectBuffer } from '../controls/SelectControl';
 

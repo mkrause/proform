@@ -7,7 +7,7 @@ import * as React from 'react';
 
 import * as Ctx from './context/FormContext';
 import { useAccessorFor } from './Accessor';
-import type { ControlBufferProps } from './components/Control';
+import type { ControlBufferProps } from './controls/Control';
 
 import { connectText } from './controls/TextControl';
 import { connectTextArea } from './controls/TextAreaControl';

@@ -3,7 +3,7 @@ import { Updater } from '../../util/types';
 
 import * as React from 'react';
 
-import type { ControlBufferProps } from '../../components/Control';
+import type { ControlBufferProps } from '../Control';
 
 import * as Ctx from '../../context/FormContext';
 import type { OptionKey } from '../CheckboxGroupControl';
@@ -56,7 +56,9 @@ export const connectSelectAll = <A,>(FormContext: Ctx.FormContext<A>) =>
                     if (bufferUpdated === null) {
                         // The checkbox component should not trigger an indeterminate state on its own accord. We
                         // cannot determine an options list to use as buffer in this case.
-                        throw new TypeError(`Cannot determine options list from indeterminate checkbox`);
+                        throw new TypeError(
+                            `Invalid buffer update: \`null\`. Cannot determine options list from indeterminate checkbox`
+                        );
                     }
                     
                     const bufferUpdatedAsArray: Updater<ReadonlyArray<OptionKey>> =
